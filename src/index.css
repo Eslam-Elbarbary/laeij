@@ -17,6 +17,16 @@
     --luxury-cream: #f9f7f4;
   }
 
+  /* Prevent font size inflation */
+  *,
+  *::before,
+  *::after {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   html.dark {
     /* Dark Mode Colors */
     --surface-color: #212121;

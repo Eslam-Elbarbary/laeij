@@ -62,13 +62,13 @@ const Contact = () => {
           <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
             {/* Phone Number */}
             <div
-              className={`backdrop-blur-sm ltr rounded-2xl p-6 md:p-8 border-2 shadow-lg hover:shadow-2xl transition-all duration-300 ${
+              className={`backdrop-blur-sm   rounded-2xl p-6 md:p-8 border-2 shadow-lg hover:shadow-2xl transition-all duration-300 ${
                 isDark
                   ? "bg-luxury-brown-darker/90 border-luxury-gold-dark/20 hover:border-luxury-gold/50"
                   : "bg-luxury-cream/95 border-luxury-gold-light/40 hover:border-luxury-gold-light/70"
               }`}
             >
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center ltr gap-4 mb-4">
                 <div
                   className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
                     isDark ? "bg-luxury-gold/20" : "bg-luxury-gold/20"
@@ -92,7 +92,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3
-                    className={`font-semibold text-lg md:text-xl mb-1 ${
+                    className={`font-semibold flex text-lg md:text-xl mb-1 ${
                       isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
                     }`}
                   >
@@ -102,7 +102,7 @@ const Contact = () => {
                     href="tel:+971561234567"
                     className={`text-base md:text-lg font-medium transition-colors ${
                       isDark
-                        ? "text-luxury-cream hover:text-luxury-gold"
+                        ? "text-[#f7f2ef] hover:text-luxury-gold"
                         : "text-luxury-brown-text hover:text-luxury-gold"
                     }`}
                   >
@@ -114,15 +114,15 @@ const Contact = () => {
 
             {/* Address */}
             <div
-              className={`backdrop-blur-sm ltr rounded-2xl p-6 md:p-8 border-2 shadow-lg hover:shadow-2xl transition-all duration-300 ${
+              className={`backdrop-blur-sm  rounded-2xl p-6 md:p-8 border-2 shadow-lg hover:shadow-2xl transition-all duration-300 ${
                 isDark
                   ? "bg-luxury-brown-darker/90 border-luxury-gold-dark/20 hover:border-luxury-gold/50"
                   : "bg-luxury-cream/95 border-luxury-gold-light/40 hover:border-luxury-gold-light/70"
               }`}
             >
-              <div className="flex items-start gap-4 mb-4">
+              <div className="flex items-start ltr  gap-3 mb-4">
                 <div
-                  className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  className={`w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 ${
                     isDark ? "bg-luxury-gold/20" : "bg-luxury-gold/20"
                   }`}
                 >
@@ -150,15 +150,15 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3
-                    className={`font-semibold text-lg md:text-xl mb-1 ${
+                    className={`font-semibold flex text-lg md:text-xl mb-1 ${
                       isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
                     }`}
                   >
                     {t("contact.address")}
                   </h3>
                   <p
-                    className={`text-base md:text-lg mb-1 ${
-                      isDark ? "text-luxury-cream" : "text-luxury-brown-text"
+                    className={`text-base flex md:text-lg mb-1 ${
+                      isDark ? "text-[#f7f2ef]" : "text-luxury-brown-text"
                     }`}
                   >
                     {t("contact.addressLocation")}

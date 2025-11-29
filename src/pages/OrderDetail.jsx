@@ -4,6 +4,9 @@ import PageLayout from "../components/PageLayout";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
+import { getTranslatedName } from "../utils/translations";
 
 const OrderDetail = () => {
   const { id } = useParams();
@@ -11,16 +14,17 @@ const OrderDetail = () => {
   const { isDark } = useTheme();
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const hasShownToast = useRef(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated && !hasShownToast.current) {
       hasShownToast.current = true;
-      showToast("يرجى تسجيل الدخول لعرض تفاصيل الطلب", "error");
+      showToast(t("orderDetail.pleaseLogin"), "error");
       navigate("/login");
     }
-  }, [isAuthenticated, navigate, showToast]);
+  }, [isAuthenticated, navigate, showToast, t]);
 
   // Don't render if not authenticated
   if (!isAuthenticated) {
@@ -87,7 +91,7 @@ const OrderDetail = () => {
   };
 
   const formatPrice = (price) => {
-    return price.toLocaleString("ar-AE");
+    return price.toLocaleString(i18n.language === "ar" ? "ar-AE" : "en-US");
   };
   const panelClasses = isDark
     ? "bg-luxury-brown-darker/90 border border-luxury-gold-dark/40 text-luxury-brown-light"
@@ -113,7 +117,7 @@ const OrderDetail = () => {
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span>قيد التنفيذ</span>
+          <span>{t("orders.status.inProgress")}</span>
         </span>
       );
     }
@@ -132,7 +136,7 @@ const OrderDetail = () => {
             d="M5 13l4 4L19 7"
           />
         </svg>
-        <span>أكتملت</span>
+        <span>{t("orders.status.completed")}</span>
       </span>
     );
   };
@@ -141,19 +145,19 @@ const OrderDetail = () => {
     <PageLayout>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 lg:py-20">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 md:mb-12">
-          <div>
+        <div className={`flex flex-col md:flex-row ${i18n.language === "ar" ? "md:flex-row-reverse" : ""} md:items-center justify-between gap-4 mb-8 md:mb-12`}>
+          <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-2 md:mb-3">
-              تفاصيل الطلب
+              {t("orderDetail.title")}
             </h1>
             <p className="text-muted text-base md:text-lg">
-              رقم الطلب:{" "}
+              {t("orderDetail.orderNumber")}:{" "}
               <span className="text-amber-500 font-semibold">#{order.id}</span>
             </p>
           </div>
           <Link
             to="/orders"
-            className="text-amber-500 hover:text-amber-400 text-base md:text-lg font-medium transition-colors flex items-center gap-2"
+            className={`text-amber-500 hover:text-amber-400 text-base md:text-lg font-medium transition-colors flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-2`}
           >
             <svg
               className="w-5 h-5"
@@ -165,10 +169,10 @@ const OrderDetail = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                d={i18n.language === "ar" ? "M14 5l7 7m0 0l-7 7m7-7H3" : "M10 19l-7-7m0 0l7-7m-7 7h18"}
               />
             </svg>
-            <span>العودة إلى الطلبات</span>
+            <span>{t("orderDetail.backToOrders")}</span>
           </Link>
         </div>
 
@@ -179,10 +183,10 @@ const OrderDetail = () => {
             <div
               className={`${panelClasses} backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg`}
             >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <div>
+              <div className={`flex flex-col md:flex-row ${i18n.language === "ar" ? "md:flex-row-reverse" : ""} md:items-center justify-between gap-4 mb-6`}>
+                <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
                   <p className="text-muted text-sm md:text-base mb-2">
-                    تاريخ الطلب
+                    {t("orderDetail.orderDate")}
                   </p>
                   <p className="text-primary font-semibold text-base md:text-lg">
                     {order.date}
@@ -191,7 +195,7 @@ const OrderDetail = () => {
                 {getStatusBadge(order.status)}
               </div>
               {order.status === "in-progress" && (
-                <div className="bg-amber-900/10 border border-amber-700/30 rounded-xl p-4 md:p-5 flex items-start gap-3 md:gap-4">
+                <div className={`bg-amber-900/10 border border-amber-700/30 rounded-xl p-4 md:p-5 flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-start gap-3 md:gap-4`}>
                   <svg
                     className="w-5 h-5 md:w-6 md:h-6 text-amber-500 flex-shrink-0 mt-0.5"
                     fill="none"
@@ -205,12 +209,12 @@ const OrderDetail = () => {
                       d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  <div>
+                  <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
                     <p className="text-amber-400 font-semibold text-sm md:text-base mb-1">
-                      متوقع التوصيل: {order.deliveryDate}
+                      {t("orderDetail.expectedDelivery")}: {order.deliveryDate}
                     </p>
                     <p className="text-muted text-xs md:text-sm">
-                      سيتم تحديث حالة الطلب عند الشحن
+                      {t("orderDetail.statusUpdate")}
                     </p>
                   </div>
                 </div>
@@ -221,9 +225,9 @@ const OrderDetail = () => {
             <div
               className={`${panelClasses} backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg`}
             >
-              <div className="flex items-center gap-3 md:gap-4 mb-6 pb-4 border-b border-card">
-                <h2 className="text-primary font-bold text-xl md:text-2xl text-right flex-1">
-                  المنتجات ({order.productCount})
+              <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-3 md:gap-4 mb-6 pb-4 border-b border-card`}>
+                <h2 className={`text-primary font-bold text-xl md:text-2xl ${i18n.language === "ar" ? "text-right" : "text-left"} flex-1`}>
+                  {t("orderDetail.items")} ({order.productCount})
                 </h2>
                 <svg
                   className="w-5 h-5 md:w-6 md:h-6 text-amber-500 flex-shrink-0"
@@ -269,19 +273,19 @@ const OrderDetail = () => {
                         />
                       </svg>
                     </Link>
-                    <div className="flex-1 min-w-0 text-right">
+                    <div className={`flex-1 min-w-0 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                       <h3 className="text-primary font-semibold text-base md:text-lg mb-1 line-clamp-1">
-                        {product.name}
+                        {getTranslatedName(product)}
                       </h3>
                       <p className="text-muted text-sm md:text-base mb-2">
-                        الحجم: {product.size}
+                        {t("orderDetail.size")}: {product.size}
                       </p>
-                      <div className="flex items-center justify-between">
+                      <div className={`flex items-center ${i18n.language === "ar" ? "justify-between" : "justify-between"}`}>
                         <p className="text-amber-500 font-bold text-base md:text-lg">
-                          {formatPrice(product.price * product.quantity)} درهم
+                          {formatPrice(product.price * product.quantity)} {t("orderDetail.currency")}
                         </p>
                         <p className="text-muted text-sm">
-                          الكمية: {product.quantity}
+                          {t("orderDetail.quantity")}: {product.quantity}
                         </p>
                       </div>
                     </div>
@@ -316,9 +320,9 @@ const OrderDetail = () => {
             <div
               className={`${panelClasses} backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg`}
             >
-              <div className="flex items-center gap-3 md:gap-4 mb-6">
-                <h2 className="text-primary font-bold text-xl md:text-2xl text-right flex-1">
-                  عنوان التوصيل
+              <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-3 md:gap-4 mb-6`}>
+                <h2 className={`text-primary font-bold text-xl md:text-2xl ${i18n.language === "ar" ? "text-right" : "text-left"} flex-1`}>
+                  {t("orderDetail.shippingAddress")}
                 </h2>
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
                   <svg
@@ -381,28 +385,28 @@ const OrderDetail = () => {
             <div
               className={`${panelClasses} backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg lg:sticky lg:top-24`}
             >
-              <h3 className="text-primary font-bold text-xl md:text-2xl mb-6 pb-4 border-b border-card">
-                ملخص الطلب
+              <h3 className={`text-primary font-bold text-xl md:text-2xl mb-6 pb-4 border-b border-card ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                {t("orderDetail.orderSummary")}
               </h3>
               <div className="space-y-4 md:space-y-5">
-                <div className="flex justify-between text-secondary text-base md:text-lg">
-                  <span>المجموع الجزئي</span>
-                  <span>{formatPrice(order.subtotal)} درهم</span>
+                <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} justify-between text-secondary text-base md:text-lg`}>
+                  <span>{t("orderDetail.subtotal")}</span>
+                  <span>{formatPrice(order.subtotal)} {t("orderDetail.currency")}</span>
                 </div>
                 {order.discount > 0 && (
-                  <div className="flex justify-between text-green-400 text-base md:text-lg font-semibold">
-                    <span>الخصم</span>
-                    <span>-{formatPrice(order.discount)} درهم</span>
+                  <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} justify-between text-green-400 text-base md:text-lg font-semibold`}>
+                    <span>{t("orderDetail.discount")}</span>
+                    <span>-{formatPrice(order.discount)} {t("orderDetail.currency")}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-secondary text-base md:text-lg">
-                  <span>التوصيل</span>
-                  <span>{formatPrice(order.delivery)} درهم</span>
+                <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} justify-between text-secondary text-base md:text-lg`}>
+                  <span>{t("orderDetail.shipping")}</span>
+                  <span>{formatPrice(order.delivery)} {t("orderDetail.currency")}</span>
                 </div>
-                <div className="border-t border-card pt-4 md:pt-5 flex justify-between text-primary font-bold text-xl md:text-2xl">
-                  <span>الإجمالي</span>
+                <div className={`border-t border-card pt-4 md:pt-5 flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} justify-between text-primary font-bold text-xl md:text-2xl`}>
+                  <span>{t("orderDetail.total")}</span>
                   <span className="text-amber-500">
-                    {formatPrice(order.total)} درهم
+                    {formatPrice(order.total)} {t("orderDetail.currency")}
                   </span>
                 </div>
               </div>
@@ -412,7 +416,7 @@ const OrderDetail = () => {
             <div
               className={`${panelClasses} backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg`}
             >
-              <div className="flex ltr items-center gap-3 md:gap-4 mb-6">
+              <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-3 md:gap-4 mb-6`}>
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
                   <svg
                     className="w-5 h-5 md:w-6 md:h-6 text-amber-500"
@@ -428,24 +432,24 @@ const OrderDetail = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-primary font-bold text-lg md:text-xl">
-                  بيانات الدفع
+                <h3 className={`text-primary font-bold text-lg md:text-xl ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  {t("orderDetail.paymentDetails")}
                 </h3>
               </div>
               <div className="space-y-4">
-                <div>
+                <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
                   <p className="text-muted text-sm md:text-base mb-2">
-                    طريقة الدفع
+                    {t("orderDetail.paymentMethod")}
                   </p>
                   <p className="text-primary font-semibold text-base md:text-lg">
                     {order.payment.method}
                   </p>
                 </div>
-                <div>
+                <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
                   <p className="text-muted text-sm md:text-base mb-2">
-                    بيانات البطاقة
+                    {t("orderDetail.cardDetails")}
                   </p>
-                  <p className="text-primary font-medium text-base md:text-lg">
+                  <p className="text-primary font-medium text-base md:text-lg ltr">
                     {order.payment.cardNumber}
                   </p>
                 </div>
@@ -472,7 +476,7 @@ const OrderDetail = () => {
                       d="M13 10V3L4 14h7v7l9-11h-7z"
                     />
                   </svg>
-                  <span>تتبع الطلب</span>
+                  <span>{t("orderDetail.trackOrder")}</span>
                 </button>
               )}
               <Link
@@ -483,7 +487,7 @@ const OrderDetail = () => {
                     : "bg-white text-luxury-brown-text hover:bg-luxury-cream border-luxury-gold-light/40"
                 }`}
               >
-                متابعة التسوق
+                {t("orderDetail.continueShopping")}
               </Link>
             </div>
           </div>

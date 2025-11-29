@@ -1,24 +1,39 @@
 /* App-specific styles */
 .App {
   min-height: 100vh;
-  background-color: #F9F7F4;
+  background-color: #f9f7f4;
   box-sizing: border-box;
   width: 100%;
 }
 
 html.dark .App {
-  background-color: #231F1F;
+  background-color: #231f1f;
 }
 
 /* Ensure RTL layout */
-[dir="rtl"] {
+html[dir="rtl"],
+html[dir="rtl"] body,
+html[dir="rtl"] .App {
   direction: rtl;
   text-align: right;
 }
 
+/* Ensure LTR layout */
+html[dir="ltr"],
+html[dir="ltr"] body,
+html[dir="ltr"] .App {
+  direction: ltr;
+  text-align: left;
+}
+
 /* Fix for flexbox in RTL - only for horizontal flex, not flex-col */
-[dir="rtl"] .flex:not(.flex-col):not([class*="flex-col"]) {
+html[dir="rtl"] .flex:not(.flex-col):not([class*="flex-col"]) {
   flex-direction: row-reverse;
+}
+
+/* Fix for flexbox in LTR - normal direction */
+html[dir="ltr"] .flex:not(.flex-col):not([class*="flex-col"]) {
+  flex-direction: row;
 }
 
 /* Input focus styles */

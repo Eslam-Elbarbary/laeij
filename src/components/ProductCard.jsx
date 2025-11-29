@@ -4,8 +4,16 @@ import { useCart } from "../contexts/CartContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
+import {
+  getTranslatedName,
+  getTranslatedDescription,
+  getTranslatedCategory,
+  getTranslatedSize,
+} from "../utils/translations";
 
 const ProductCard = ({ product }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addToCart, cartItems } = useCart();
@@ -16,21 +24,29 @@ const ProductCard = ({ product }) => {
   const cartItem = cartItems.find((item) => item.id === product.id);
   const inCart = !!cartItem;
 
+  // Get translated product data (computed on each render to reflect language changes)
+  const productName = getTranslatedName(product);
+  const productDescription = getTranslatedDescription(product);
+  const productCategory = getTranslatedCategory(
+    product.category || product.categoryName,
+    product.categoryId
+  );
+
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      showToast("يرجى تسجيل الدخول لإضافة المنتج إلى السلة", "error");
+      showToast(t("productCard.loginRequired"), "error");
       navigate("/login");
       return;
     }
 
     addToCart(product, 1);
     if (cartItem) {
-      showToast(`تم تحديث الكمية في السلة`, "success");
+      showToast(t("productCard.updatedInCart"), "success");
     } else {
-      showToast(`تم إضافة ${product.name} إلى السلة`, "success");
+      showToast(t("productCard.addedToCart", { name: productName }), "success");
     }
   };
 
@@ -39,17 +55,23 @@ const ProductCard = ({ product }) => {
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      showToast("يرجى تسجيل الدخول لإضافة المنتج إلى قائمة الأمنيات", "error");
+      showToast(t("productCard.loginRequiredWishlist"), "error");
       navigate("/login");
       return;
     }
 
     if (inWishlist) {
       removeFromWishlist(product.id);
-      showToast(`تم إزالة ${product.name} من قائمة الأمنيات`, "info");
+      showToast(
+        t("productCard.removedFromWishlist", { name: productName }),
+        "info"
+      );
     } else {
       addToWishlist(product);
-      showToast(`تم إضافة ${product.name} إلى قائمة الأمنيات`, "success");
+      showToast(
+        t("productCard.addedToWishlist", { name: productName }),
+        "success"
+      );
     }
   };
 
@@ -81,7 +103,7 @@ const ProductCard = ({ product }) => {
           />
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20 bg-white/40 dark:bg-black/40">
             <span className="text-white text-sm font-semibold bg-luxury-gold px-4 py-2 rounded-lg">
-              عرض سريع
+              {t("productCard.quickView")}
             </span>
           </div>
 
@@ -118,28 +140,28 @@ const ProductCard = ({ product }) => {
       <div className="p-6 sm:p-7 md:p-8 flex-1 flex flex-col justify-between bg-card-muted">
         <div className="flex-1">
           <p className="text-luxury-gold text-xs sm:text-sm font-semibold mb-2">
-            {product.category}
+            {productCategory}
           </p>
           <Link to={`/product/${product.id}`}>
             <h3 className="font-bold text-base sm:text-lg md:text-xl line-clamp-1 text-primary group-hover:text-luxury-gold-light transition-colors duration-300">
-              {product.name}
+              {productName}
             </h3>
           </Link>
           <p className="text-xs sm:text-sm line-clamp-2 leading-relaxed mt-3 text-muted">
-            {product.description}
+            {productDescription}
           </p>
         </div>
 
-        {/* الحجم ثابت فوق السعر */}
+        {/* Size - Fixed above price */}
         <p className="text-luxury-gold-light text-xs sm:text-sm font-medium mt-3">
-          الحجم: {product.size}
+          {t("productCard.size")}: {getTranslatedSize(product.size)}
         </p>
 
         {/* السعر + زرار إضافة للعربة */}
         <div className="mt-3 pt-4 border-t border-card group-hover:border-luxury-gold/40 transition-colors duration-300">
           <div className="flex items-center justify-between mb-3">
             <span className="text-luxury-gold font-bold text-lg sm:text-xl md:text-2xl group-hover:text-luxury-gold-light transition-colors duration-300">
-              {product.price} درهم
+              {product.price} {t("productCard.currency")}
             </span>
             {inCart && (
               <span className="text-xs sm:text-sm text-green-500 font-semibold flex items-center gap-1">
@@ -154,7 +176,7 @@ const ProductCard = ({ product }) => {
                     clipRule="evenodd"
                   />
                 </svg>
-                في السلة ({cartItem.quantity})
+                {t("productCard.inCart")} ({cartItem.quantity})
               </span>
             )}
           </div>
@@ -184,7 +206,7 @@ const ProductCard = ({ product }) => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>في السلة</span>
+                <span>{t("productCard.inCart")}</span>
               </>
             ) : (
               <>
@@ -201,7 +223,7 @@ const ProductCard = ({ product }) => {
                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
-                <span>أضف للسلة</span>
+                <span>{t("productCard.addToCart")}</span>
               </>
             )}
           </button>

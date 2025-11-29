@@ -7,6 +7,13 @@ import { useWishlist } from "../contexts/WishlistContext";
 import { useCart } from "../contexts/CartContext";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
+import {
+  getTranslatedName,
+  getTranslatedDescription,
+  getTranslatedCategory,
+} from "../utils/translations";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -16,6 +23,7 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { showToast } = useToast();
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,10 +41,10 @@ const ProductDetail = () => {
           setProduct(response.data);
           setSelectedSize(response.data.size || "12 g");
         } else {
-          setError(response.message || "المنتج غير موجود");
+          setError(response.message || t("productDetail.notFound"));
         }
       } catch (err) {
-        setError("فشل في تحميل تفاصيل المنتج");
+        setError(t("productDetail.errorLoading"));
         console.error("Error fetching product:", err);
       } finally {
         setLoading(false);
@@ -51,7 +59,7 @@ const ProductDetail = () => {
   // Format price helper
   const formatPrice = (price) => {
     if (typeof price === "number") {
-      return price.toLocaleString("ar-AE");
+      return price.toLocaleString(i18n.language === "ar" ? "ar-AE" : "en-US");
     }
     return price;
   };
@@ -103,13 +111,13 @@ const ProductDetail = () => {
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 lg:py-20">
           <div className="text-center py-12">
             <p className="text-red-400 text-lg mb-4">
-              {error || "المنتج غير موجود"}
+              {error || t("productDetail.notFound")}
             </p>
             <button
               onClick={() => navigate("/products")}
               className="bg-amber-700 hover:bg-amber-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300"
             >
-              العودة إلى المنتجات
+              {t("productDetail.backToProducts")}
             </button>
           </div>
         </div>
@@ -187,7 +195,7 @@ const ProductDetail = () => {
                 </span>
                 {product.reviews && (
                   <span className="text-muted text-sm">
-                    ({product.reviews} تقييم)
+                    ({product.reviews} {t("productDetail.review")})
                   </span>
                 )}
               </div>
@@ -195,24 +203,27 @@ const ProductDetail = () => {
 
             <div>
               <p className="text-amber-500 text-sm mb-2 font-medium">
-                {product.category}
+                {getTranslatedCategory(product.category)}
               </p>
               <h1 className="text-primary text-4xl lg:text-5xl font-bold mb-4">
-                {product.name}
+                {getTranslatedName(product)}
               </h1>
               <div className="flex items-center ltr gap-4">
                 <p className="text-amber-500 text-3xl lg:text-4xl font-bold">
-                  {formatPrice(currentPrice)} درهم
+                  {formatPrice(currentPrice)} {t("productDetail.currency")}
                 </p>
                 {product.originalPrice &&
                   product.originalPrice > currentPrice && (
                     <p className="text-muted text-xl line-through">
-                      {formatPrice(product.originalPrice)} درهم
+                      {formatPrice(product.originalPrice)}{" "}
+                      {t("productDetail.currency")}
                     </p>
                   )}
                 {product.discount > 0 && (
                   <span className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-semibold">
-                    خصم {product.discount}%
+                    {t("productDetail.discount", {
+                      discount: product.discount,
+                    })}
                   </span>
                 )}
               </div>
@@ -221,7 +232,7 @@ const ProductDetail = () => {
             {/* Size Selection */}
             <div>
               <label className="block text-primary text-lg font-semibold mb-4">
-                الحجم:
+                {t("productDetail.size")}:
               </label>
               <div className="flex ltr gap-3 flex-wrap">
                 {sizes.map((size) => (
@@ -243,7 +254,7 @@ const ProductDetail = () => {
             {/* Quantity */}
             <div>
               <label className="block text-lg font-semibold mb-4 text-primary">
-                العدد:
+                {t("productDetail.quantity")}:
               </label>
               <div className="flex ltr items-center gap-4">
                 <button
@@ -274,9 +285,11 @@ const ProductDetail = () => {
 
             {/* Description */}
             <div>
-              <h3 className="font-semibold text-xl mb-3 text-primary">الوصف</h3>
+              <h3 className="font-semibold text-xl mb-3 text-primary">
+                {t("productDetail.description")}
+              </h3>
               <p className="leading-relaxed text-secondary">
-                {product.description}
+                {getTranslatedDescription(product)}
               </p>
             </div>
 
@@ -289,7 +302,9 @@ const ProductDetail = () => {
                     : "border-luxury-gold-light/40 hover:bg-luxury-cream/70 text-luxury-brown-text"
                 }`}
               >
-                <span className="font-medium">السمات الرئيسية</span>
+                <span className="font-medium">
+                  {t("productDetail.keyFeatures")}
+                </span>
                 <span>▼</span>
               </button>
             </div>
@@ -299,10 +314,7 @@ const ProductDetail = () => {
               <button
                 onClick={() => {
                   if (!isAuthenticated) {
-                    showToast(
-                      "يرجى تسجيل الدخول لإضافة المنتج إلى قائمة الأمنيات",
-                      "error"
-                    );
+                    showToast(t("productDetail.pleaseLoginWishlist"), "error");
                     navigate("/login");
                     return;
                   }
@@ -311,19 +323,23 @@ const ProductDetail = () => {
                     if (isInWishlist(product.id)) {
                       removeFromWishlist(product.id);
                       showToast(
-                        `تم إزالة ${product.name} من قائمة الأمنيات`,
+                        t("productDetail.removedFromWishlist", {
+                          name: getTranslatedName(product),
+                        }),
                         "info"
                       );
                     } else {
                       addToWishlist(product);
                       showToast(
-                        `تم إضافة ${product.name} إلى قائمة الأمنيات`,
+                        t("productDetail.addedToWishlist", {
+                          name: getTranslatedName(product),
+                        }),
                         "success"
                       );
                     }
                   }
                 }}
-                className={`flex-1 py-5 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-luxury-gold/60 flex items-center justify-center gap-3 ${
+                className={`flex-1 min-w-[200px] max-w-[250px] py-5 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-luxury-gold/60 flex items-center justify-center gap-3 ${
                   product && isInWishlist(product.id)
                     ? isDark
                       ? "bg-red-500/90 text-white hover:bg-red-600/90"
@@ -351,30 +367,36 @@ const ProductDetail = () => {
                 </svg>
                 <span>
                   {product && isInWishlist(product.id)
-                    ? "إزالة من الأمنيات"
-                    : "إضافة للأمنيات"}
+                    ? t("productDetail.removeFromWishlist")
+                    : t("productDetail.addToWishlist")}
                 </span>
               </button>
               <button
                 onClick={() => {
                   if (!isAuthenticated) {
-                    showToast(
-                      "يرجى تسجيل الدخول لإضافة المنتج إلى السلة",
-                      "error"
-                    );
+                    showToast(t("productDetail.pleaseLoginCart"), "error");
                     navigate("/login");
                     return;
                   }
 
                   if (product) {
                     addToCart({ ...product, quantity, selectedSize });
-                    showToast(`تم إضافة ${product.name} إلى السلة`, "success");
+                    showToast(
+                      t("productDetail.addedToCart", {
+                        name: getTranslatedName(product),
+                      }),
+                      "success"
+                    );
                     setTimeout(() => navigate("/cart"), 500);
                   }
                 }}
-                className="flex-[2] bg-gradient-to-r from-amber-600 to-amber-800 text-white py-5 rounded-xl font-semibold text-xl hover:from-amber-700 hover:to-amber-900 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-luxury-gold/60"
+                className="flex-[2] min-w-[280px] bg-gradient-to-r from-amber-600 to-amber-800 text-white py-5 rounded-xl font-semibold text-xl hover:from-amber-700 hover:to-amber-900 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-luxury-gold/60"
               >
-                أضف الي السلة | {formatPrice(currentPrice * quantity)} درهم
+                {t("productDetail.addToCartWithPrice", {
+                  price: `${formatPrice(currentPrice * quantity)} ${t(
+                    "productDetail.currency"
+                  )}`,
+                })}
               </button>
             </div>
           </div>

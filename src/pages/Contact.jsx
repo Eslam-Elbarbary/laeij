@@ -2,10 +2,13 @@ import { useState } from "react";
 import PageLayout from "../components/PageLayout";
 import { useTheme } from "../contexts/ThemeContext";
 import { useToast } from "../contexts/ToastContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 const Contact = () => {
   const { isDark } = useTheme();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,7 +24,7 @@ const Contact = () => {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      showToast("تم إرسال رسالتك بنجاح! سنتواصل معك قريباً", "success");
+      showToast(t("contact.sent"), "success");
       setFormData({ name: "", email: "", phone: "", message: "" });
     }, 1500);
   };
@@ -38,20 +41,20 @@ const Contact = () => {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 lg:py-20">
         <div className="space-y-8 md:space-y-12">
           {/* Header Section */}
-          <div className="text-center md:text-right mb-8 md:mb-12">
+          <div className={`text-center ${i18n.language === "ar" ? "md:text-right" : "md:text-left"} mb-8 md:mb-12`}>
             <h1
               className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 ${
                 isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
               }`}
             >
-              تواصل مع بوتيك لاعج
+              {t("contact.title")}
             </h1>
             <p
               className={`text-lg md:text-xl ${
                 isDark ? "text-luxury-cream/80" : "text-luxury-brown-text"
               }`}
             >
-              نحن هنا لمساعدتك في أي وقت
+              {t("contact.subtitle")}
             </p>
           </div>
 
@@ -93,7 +96,7 @@ const Contact = () => {
                       isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
                     }`}
                   >
-                    الهاتف
+                    {t("contact.phoneLabel")}
                   </h3>
                   <a
                     href="tel:+971561234567"
@@ -151,14 +154,14 @@ const Contact = () => {
                       isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
                     }`}
                   >
-                    العنوان
+                    {t("contact.address")}
                   </h3>
                   <p
                     className={`text-base md:text-lg mb-1 ${
                       isDark ? "text-luxury-cream" : "text-luxury-brown-text"
                     }`}
                   >
-                    أبو ظبي - المنهل
+                    {t("contact.addressLocation")}
                   </p>
                   <p
                     className={`text-sm md:text-base ${
@@ -167,7 +170,7 @@ const Contact = () => {
                         : "text-luxury-brown-text/70"
                     }`}
                   >
-                    555 شارع الشيخة فطيمة بنت مبارك
+                    {t("contact.addressStreet")}
                   </p>
                 </div>
               </div>
@@ -177,11 +180,11 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="space-y-4 md:space-y-6 mb-8 md:mb-12">
             <h2
-              className={`text-2xl md:text-3xl font-bold text-center md:text-right ${
+              className={`text-2xl md:text-3xl font-bold text-center ${i18n.language === "ar" ? "md:text-right" : "md:text-left"} ${
                 isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
               }`}
             >
-              أرسل لنا رسالة
+              {t("contact.sendUsMessage")}
             </h2>
             <form
               onSubmit={handleSubmit}
@@ -200,7 +203,7 @@ const Contact = () => {
                         : "text-luxury-brown-text"
                     }`}
                   >
-                    الاسم
+                    {t("contact.name")}
                   </label>
                   <input
                     type="text"
@@ -209,7 +212,7 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
-                    placeholder="أدخل اسمك"
+                    placeholder={t("contact.namePlaceholder")}
                   />
                 </div>
                 <div>
@@ -220,7 +223,7 @@ const Contact = () => {
                         : "text-luxury-brown-text"
                     }`}
                   >
-                    البريد الإلكتروني
+                    {t("contact.email")}
                   </label>
                   <input
                     type="email"
@@ -229,7 +232,7 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
-                    placeholder="example@email.com"
+                    placeholder={t("contact.emailPlaceholder")}
                   />
                 </div>
               </div>
@@ -241,7 +244,7 @@ const Contact = () => {
                       : "text-luxury-brown-text"
                   }`}
                 >
-                  رقم الجوال
+                  {t("contact.phone")}
                 </label>
                 <input
                   type="tel"
@@ -250,7 +253,7 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
-                  placeholder="+971 50 123 4567"
+                  placeholder={t("contact.phonePlaceholder")}
                 />
               </div>
               <div className="mb-6 md:mb-8">
@@ -261,7 +264,7 @@ const Contact = () => {
                       : "text-luxury-brown-text"
                   }`}
                 >
-                  الرسالة
+                  {t("contact.message")}
                 </label>
                 <textarea
                   name="message"
@@ -270,7 +273,7 @@ const Contact = () => {
                   required
                   rows={6}
                   className={`w-full px-4 py-3 rounded-xl resize-none ${inputClasses}`}
-                  placeholder="اكتب رسالتك هنا..."
+                  placeholder={t("contact.messagePlaceholder")}
                 />
               </div>
               <button
@@ -282,7 +285,7 @@ const Contact = () => {
                     : "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold hover:from-luxury-gold-light hover:via-luxury-gold hover:to-luxury-gold-light text-luxury-brown-darker border-luxury-gold-dark shadow-luxury-gold-dark/30"
                 }`}
               >
-                {isSubmitting ? "جاري الإرسال..." : "إرسال الرسالة"}
+                {isSubmitting ? t("contact.sending") : t("contact.sendMessage")}
               </button>
             </form>
           </div>
@@ -290,11 +293,11 @@ const Contact = () => {
           {/* Map Section */}
           <div className="space-y-4 md:space-y-6">
             <h2
-              className={`text-2xl md:text-3xl font-bold text-center md:text-right ${
+              className={`text-2xl md:text-3xl font-bold text-center ${i18n.language === "ar" ? "md:text-right" : "md:text-left"} ${
                 isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
               }`}
             >
-              موقعنا على الخريطة
+              {t("contact.mapTitle")}
             </h2>
             <div
               className={`backdrop-blur-sm rounded-2xl overflow-hidden h-64 md:h-96 lg:h-[500px] border-2 shadow-2xl hover:shadow-2xl transition-all duration-300 ${
@@ -312,11 +315,11 @@ const Contact = () => {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 className="w-full h-full"
-                title="موقع بوتيك لاعج - أبو ظبي"
+                title={t("contact.mapIframeTitle")}
               ></iframe>
             </div>
             <div
-              className={`rounded-xl ltr p-4 md:p-6 flex items-start gap-3 md:gap-4 border ${
+              className={`rounded-xl p-4 md:p-6 flex items-start gap-3 md:gap-4 border ${
                 isDark
                   ? "bg-luxury-gold/10 border-luxury-gold/30"
                   : "bg-luxury-gold/10 border-luxury-gold/30"
@@ -340,8 +343,7 @@ const Contact = () => {
                   isDark ? "text-[#f7f2ef]" : "text-luxury-brown-text"
                 }`}
               >
-                يمكنك استخدام الخريطة أعلاه للوصول إلى موقعنا في أبو ظبي. نحن
-                متواجدون من السبت إلى الخميس من 9 صباحاً حتى 9 مساءً.
+                {t("contact.mapInfo")}
               </p>
             </div>
           </div>

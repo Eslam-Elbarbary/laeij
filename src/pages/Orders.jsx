@@ -4,12 +4,15 @@ import PageLayout from "../components/PageLayout";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 const Orders = () => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("all");
   const hasShownToast = useRef(false);
 
@@ -17,7 +20,7 @@ const Orders = () => {
   useEffect(() => {
     if (!isAuthenticated && !hasShownToast.current) {
       hasShownToast.current = true;
-      showToast("يرجى تسجيل الدخول لعرض الطلبات", "error");
+      showToast(t("orders.pleaseLogin"), "error");
       navigate("/login");
     }
   }, [isAuthenticated, navigate, showToast]);
@@ -116,13 +119,67 @@ const Orders = () => {
     : "bg-card-muted text-secondary border border-card hover:text-primary";
 
   const formatPrice = (price) => {
-    return price.toLocaleString("ar-AE");
+    return price.toLocaleString(i18n.language === "ar" ? "ar-AE" : "en-US");
+  };
+
+  // Format date based on language
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    
+    try {
+      // Try to parse the date string - format: "02:30 ص - 12 نوفمبر 2025"
+      const parts = dateString.match(/(\d{1,2}):(\d{2})\s*([صم])\s*-\s*(\d{1,2})\s*(\S+)\s*(\d{4})/);
+      
+      if (parts) {
+        const [, hour, minute, ampm, day, month, year] = parts;
+        let hour24 = parseInt(hour);
+        
+        // Convert 12-hour to 24-hour format
+        if (ampm === "م" && hour24 !== 12) hour24 += 12;
+        if (ampm === "ص" && hour24 === 12) hour24 = 0;
+        
+        // Arabic month names to month index
+        const monthMapAr = {
+          "يناير": 0, "فبراير": 1, "مارس": 2, "أبريل": 3, "مايو": 4, "يونيو": 5,
+          "يوليو": 6, "أغسطس": 7, "سبتمبر": 8, "أكتوبر": 9, "نوفمبر": 10, "ديسمبر": 11
+        };
+        
+        const monthIndex = monthMapAr[month] !== undefined ? monthMapAr[month] : parseInt(month) - 1;
+        const date = new Date(parseInt(year), monthIndex, parseInt(day), hour24, parseInt(minute));
+        
+        // Format based on language
+        if (i18n.language === "ar") {
+          return date.toLocaleString("ar-AE", {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour12: true
+          });
+        } else {
+          return date.toLocaleString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour12: true
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error formatting date:", error);
+    }
+    
+    // If parsing fails, return as is
+    return dateString;
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
       "in-progress": {
-        label: "قيد التنفيذ",
+        label: t("orders.status.inProgress"),
         bg: isDark ? "bg-amber-900/40" : "bg-amber-100",
         text: isDark ? "text-amber-300" : "text-amber-700",
         border: isDark ? "border-amber-600/60" : "border-amber-400/60",
@@ -143,7 +200,7 @@ const Orders = () => {
         ),
       },
       completed: {
-        label: "أكتملت",
+        label: t("orders.status.completed"),
         bg: isDark ? "bg-blue-900/40" : "bg-blue-100",
         text: isDark ? "text-blue-300" : "text-blue-700",
         border: isDark ? "border-blue-600/60" : "border-blue-400/60",
@@ -164,7 +221,7 @@ const Orders = () => {
         ),
       },
       delivered: {
-        label: "تم التوصيل",
+        label: t("orders.status.delivered"),
         bg: isDark ? "bg-green-900/40" : "bg-green-100",
         text: isDark ? "text-green-300" : "text-green-700",
         border: isDark ? "border-green-600/60" : "border-green-400/60",
@@ -198,10 +255,16 @@ const Orders = () => {
     );
   };
 
+  const tabs = [
+    { id: "all", label: t("orders.all") },
+    { id: "in-progress", label: t("orders.inProgress") },
+    { id: "completed", label: t("orders.completed") },
+  ];
+
   const filteredOrders =
     activeTab === "all"
       ? orders
-      : activeTab === "قيد التنفيذ"
+      : activeTab === "in-progress"
       ? orders.filter((o) => o.status === "in-progress")
       : orders.filter(
           (o) => o.status === "completed" || o.status === "delivered"
@@ -209,40 +272,40 @@ const Orders = () => {
 
   return (
     <PageLayout>
-      <div className="w-full ltr max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 lg:py-20">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 lg:py-20">
         {/* Header */}
-        <div className="text-center md:text-right mb-8 md:mb-12">
+        <div className={`${i18n.language === "ar" ? "text-right" : "text-left"} mb-8 md:mb-12`}>
           <h1
             className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 ${
               isDark ? "text-white" : "text-luxury-brown-text"
             }`}
           >
-            طلباتي
+            {t("orders.title")}
           </h1>
           <p
             className={`text-lg md:text-xl ${
               isDark ? "text-luxury-brown-light" : "text-luxury-brown-text/80"
             }`}
           >
-            تتبع جميع طلباتك وتاريخ الشراء
+            {t("orders.subtitle")}
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-3 md:gap-4 mb-8 md:mb-12 overflow-x-auto scrollbar-hide pb-2">
-          {["الكل", "قيد التنفيذ", "أكتملت"].map((tab) => (
+        <div className={`flex ${i18n.language === "ar" ? "justify-end" : ""} gap-3 md:gap-4 mb-8 md:mb-12 overflow-x-auto scrollbar-hide pb-2`}>
+          {(i18n.language === "ar" ? [...tabs].reverse() : tabs).map((tab) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
               className={`px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold text-sm md:text-base whitespace-nowrap transition-all duration-300 shadow-lg hover:scale-105 transform ${
-                activeTab === tab
+                activeTab === tab.id
                   ? isDark
                     ? "bg-gradient-to-r from-luxury-gold to-luxury-gold-dark text-luxury-brown-darker shadow-luxury-gold/40"
                     : "bg-gradient-to-r from-luxury-gold to-luxury-gold-dark text-[#1A1410] shadow-luxury-gold/40"
                   : `${inactiveTabClasses}`
               }`}
             >
-              {tab}
+              {tab.label}
             </button>
           ))}
         </div>
@@ -280,14 +343,14 @@ const Orders = () => {
                 isDark ? "text-white" : "text-luxury-brown-text"
               }`}
             >
-              لا توجد طلبات
+              {t("orders.noOrders")}
             </h3>
             <p
               className={`text-base md:text-lg mb-6 ${
                 isDark ? "text-luxury-brown-light" : "text-luxury-brown-text/70"
               }`}
             >
-              لم تقم بأي طلبات بعد
+              {t("orders.noOrdersDesc")}
             </p>
             <Link
               to="/products"
@@ -297,7 +360,7 @@ const Orders = () => {
                   : "bg-gradient-to-r from-luxury-gold to-luxury-gold-dark hover:from-luxury-gold-light hover:to-luxury-gold text-white"
               }`}
             >
-              تصفح المنتجات
+              {t("orders.browseProducts")}
             </Link>
           </div>
         ) : (
@@ -313,30 +376,30 @@ const Orders = () => {
               >
                 {/* Order Header */}
                 <div
-                  className={`flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b ${
+                  className={`flex flex-col md:flex-row md:items-center ${i18n.language === "ar" ? "md:flex-row-reverse" : ""} justify-between gap-4 mb-6 pb-6 border-b ${
                     isDark
                       ? "border-luxury-gold-dark/30"
                       : "border-luxury-gold-light/30"
                   }`}
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 md:gap-4 mb-2">
-                      <div className="text-right flex-1">
+                  <div className={`flex-1 ${i18n.language === "ar" ? "md:order-2" : ""}`}>
+                    <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-3 md:gap-4 mb-2`}>
+                      <div className={`${i18n.language === "ar" ? "text-right" : "text-left"} flex-1`}>
                         <h3
                           className={`font-bold text-lg md:text-xl ${
                             isDark ? "text-white" : "text-luxury-brown-text"
                           }`}
                         >
-                          طلب #{order.id}
+                          {i18n.language === "ar" ? `#${order.id} ${t("orders.orderNumber")}` : `${t("orders.orderNumber")} #${order.id}`}
                         </h3>
                         <p
-                          className={`text-sm md:text-base mt-1 ${
+                          className={`text-sm md:text-base mt-1 ${i18n.language === "ar" ? "" : "ltr"} ${
                             isDark
                               ? "text-luxury-brown-light"
                               : "text-luxury-brown-text/70"
                           }`}
                         >
-                          {order.date}
+                          {formatDate(order.date)}
                         </p>
                       </div>
                       <div
@@ -366,9 +429,9 @@ const Orders = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse md:order-1" : ""} items-center gap-4`}>
                     {getStatusBadge(order.status)}
-                    <div className="text-right">
+                    <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
                       <p
                         className={`text-xs md:text-sm mb-1 ${
                           isDark
@@ -376,14 +439,14 @@ const Orders = () => {
                             : "text-luxury-brown-text/70"
                         }`}
                       >
-                        الإجمالي
+                        {t("orders.total")}
                       </p>
                       <p
-                        className={`font-bold text-lg md:text-xl ${
+                        className={`font-bold text-lg md:text-xl ${i18n.language === "ar" ? "ltr" : ""} ${
                           isDark ? "text-luxury-gold-light" : "text-luxury-gold"
                         }`}
                       >
-                        {formatPrice(order.total)} درهم
+                        {formatPrice(order.total)} {t("orders.currency")}
                       </p>
                     </div>
                   </div>
@@ -392,7 +455,7 @@ const Orders = () => {
                 {/* Order Items Preview */}
                 <div className="mb-6">
                   <div
-                    className={`flex items-center gap-2 mb-4 ${
+                    className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-2 mb-4 ${
                       isDark ? "text-white" : "text-luxury-brown-text"
                     }`}
                   >
@@ -418,10 +481,10 @@ const Orders = () => {
                         isDark ? "text-white" : "text-luxury-brown-text"
                       }`}
                     >
-                      {order.productCount} منتج
+                      {order.productCount} {order.productCount === 1 ? t("orders.products") : t("orders.productsPlural")}
                     </h4>
                   </div>
-                  <div className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2">
+                  <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2`}>
                     {order.items.slice(0, 4).map((item) => (
                       <div
                         key={item.id}
@@ -442,7 +505,7 @@ const Orders = () => {
                         />
                         {item.quantity > 1 && (
                           <div
-                            className={`absolute top-1 left-1 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold ${
+                            className={`absolute top-1 ${i18n.language === "ar" ? "right-1" : "left-1"} text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold ${
                               isDark ? "bg-luxury-gold" : "bg-luxury-gold-dark"
                             }`}
                           >
@@ -475,16 +538,16 @@ const Orders = () => {
 
                 {/* Order Actions */}
                 <div
-                  className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 md:gap-4 pt-6 border-t ${
+                  className={`flex flex-col sm:flex-row ${i18n.language === "ar" ? "sm:flex-row-reverse" : ""} items-stretch sm:items-center ${i18n.language === "ar" ? "sm:justify-start" : "justify-between"} gap-3 md:gap-4 pt-6 border-t ${
                     isDark
                       ? "border-luxury-gold-dark/30"
                       : "border-luxury-gold-light/30"
                   }`}
                 >
-                  <div className="flex items-center gap-3 md:gap-4">
+                  <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-3 md:gap-4`}>
                     <button
                       onClick={() => navigate(`/order-detail/${order.id}`)}
-                      className={`flex-1 sm:flex-none px-6 py-3 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 transform flex items-center justify-center gap-2 border ${
+                      className={`flex-1 sm:flex-none px-6 py-3 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 transform flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center justify-center gap-2 border ${
                         isDark
                           ? "bg-card-muted text-primary hover:bg-card-muted/80 border-card hover:border-luxury-gold/50"
                           : "bg-card text-primary hover:bg-card-muted border-card hover:border-luxury-gold/50"
@@ -509,11 +572,11 @@ const Orders = () => {
                           d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                         />
                       </svg>
-                      <span>عرض التفاصيل</span>
+                      <span>{t("orders.viewDetails")}</span>
                     </button>
                     {order.status === "completed" && (
                       <button
-                        className={`flex-1 sm:flex-none px-6 py-3 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 transform flex items-center justify-center gap-2 border-2 ${
+                        className={`flex-1 sm:flex-none px-6 py-3 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 transform flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center justify-center gap-2 border-2 ${
                           isDark
                             ? "bg-blue-900/30 hover:bg-blue-900/40 text-blue-300 border-blue-600/50"
                             : "bg-blue-100 hover:bg-blue-200 text-blue-700 border-blue-400/60"
@@ -532,14 +595,14 @@ const Orders = () => {
                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                           />
                         </svg>
-                        <span>إعادة الطلب</span>
+                        <span>{t("orders.reorder")}</span>
                       </button>
                     )}
                   </div>
                   {order.status === "in-progress" && (
                     <Link
                       to={`/order-detail/${order.id}`}
-                      className={`flex-1 sm:flex-none px-8 py-4 rounded-xl font-extrabold text-lg md:text-xl transition-all duration-300 shadow-2xl hover:shadow-2xl hover:scale-110 transform flex items-center justify-center gap-3 border-[3px] ${
+                      className={`flex-1 sm:flex-none px-8 py-4 rounded-xl font-extrabold text-lg md:text-xl transition-all duration-300 shadow-2xl hover:shadow-2xl hover:scale-110 transform flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center justify-center gap-3 border-[3px] ${
                         isDark
                           ? "bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:via-amber-300 hover:to-amber-400 text-luxury-brown-darker border-amber-600 shadow-amber-900/60"
                           : "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500 text-white border-amber-700 shadow-amber-900/50"
@@ -559,7 +622,7 @@ const Orders = () => {
                         />
                       </svg>
                       <span className="font-black tracking-wide">
-                        تتبع الطلب
+                        {t("orders.trackOrder")}
                       </span>
                     </Link>
                   )}

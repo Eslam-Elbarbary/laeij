@@ -1,37 +1,48 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const HeroSlider = () => {
+  const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   const slides = [
     {
-      title: "مرحباً بك في لاعج",
-      description:
-        "اكتشف روائح فريدة تمزج بين الفخامة والإحساس، لتترك بصمتك العطرية في كل مكان",
-      primaryButton: { text: "تصفح المنتجات", link: "/products" },
-      secondaryButton: { text: "استكشف الأقسام", link: "/categories" },
+      title: t("hero.slide1Title"),
+      description: t("hero.slide1Description"),
+      primaryButton: { text: t("hero.slide1PrimaryButton"), link: "/products" },
+      secondaryButton: {
+        text: t("hero.slide1SecondaryButton"),
+        link: "/categories",
+      },
       image:
         "https://images.unsplash.com/photo-1612817288484-6f916006741a?w=1920&h=1080&fit=crop&q=90&auto=format",
       overlay: "from-black/70 via-black/50 to-black/60",
     },
     {
-      title: "عطور استثنائية",
-      description:
-        "مجموعة حصرية من العطور الفاخرة المصممة خصيصاً لتجسد شخصيتك الفريدة",
-      primaryButton: { text: "اكتشف المجموعة", link: "/products" },
-      secondaryButton: { text: "عرض الكل", link: "/categories" },
+      title: t("hero.slide2Title"),
+      description: t("hero.slide2Description"),
+      primaryButton: { text: t("hero.slide2PrimaryButton"), link: "/products" },
+      secondaryButton: {
+        text: t("hero.slide2SecondaryButton"),
+        link: "/categories",
+      },
       image:
         "https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=1920&h=1080&fit=crop&q=90&auto=format",
       overlay: "from-luxury-gold-dark/80 via-luxury-gold/60 to-black/70",
     },
     {
-      title: "هدايا فاخرة",
-      description:
-        "اختر من مجموعتنا المميزة من الهدايا الفاخرة المناسبة لكل مناسبة",
-      primaryButton: { text: "تصفح الهدايا", link: "/products?category=4" },
-      secondaryButton: { text: "عرض الكل", link: "/categories" },
+      title: t("hero.slide3Title"),
+      description: t("hero.slide3Description"),
+      primaryButton: {
+        text: t("hero.slide3PrimaryButton"),
+        link: "/products?category=4",
+      },
+      secondaryButton: {
+        text: t("hero.slide3SecondaryButton"),
+        link: "/categories",
+      },
       image:
         "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=1920&h=1080&fit=crop&q=90&auto=format",
       overlay: "from-black/70 via-luxury-gold-dark/50 to-black/60",
@@ -169,7 +180,7 @@ const HeroSlider = () => {
         <button
           onClick={prevSlide}
           className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 bg-white/10 backdrop-blur-md text-white p-3 md:p-4 rounded-full hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110 focus:outline-none focus:ring-4 focus:ring-white/30"
-          aria-label="Previous slide"
+          aria-label={t("hero.previousSlide")}
         >
           <svg
             className="w-6 h-6 md:w-8 md:h-8"
@@ -188,7 +199,7 @@ const HeroSlider = () => {
         <button
           onClick={nextSlide}
           className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 bg-white/10 backdrop-blur-md text-white p-3 md:p-4 rounded-full hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110 focus:outline-none focus:ring-4 focus:ring-white/30"
-          aria-label="Next slide"
+          aria-label={t("hero.nextSlide")}
         >
           <svg
             className="w-6 h-6 md:w-8 md:h-8"
@@ -216,7 +227,7 @@ const HeroSlider = () => {
                   ? "w-10 md:w-12 h-3 md:h-4 bg-luxury-gold shadow-lg shadow-luxury-gold/60 animate-pulse-gold"
                   : "w-3 md:w-4 h-3 md:h-4 bg-white/50 hover:bg-white/80 hover:scale-125 transform"
               }`}
-              aria-label={`Go to slide ${index + 1}`}
+              aria-label={`${t("hero.goToSlide")} ${index + 1}`}
             />
           ))}
         </div>

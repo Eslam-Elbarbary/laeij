@@ -4,6 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
 import { CartProvider } from "./contexts/CartContext";
 import { ToastProvider } from "./contexts/ToastContext";
+import "./i18n";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import OTPVerification from "./pages/OTPVerification";
@@ -29,7 +30,7 @@ function App() {
           <CartProvider>
             <WishlistProvider>
               <BrowserRouter>
-                <div className="App" dir="rtl">
+                <div className="App">
                   <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route

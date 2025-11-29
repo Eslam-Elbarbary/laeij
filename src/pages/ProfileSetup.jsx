@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 import logo from "../assets/logo.png";
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -41,11 +44,11 @@ const ProfileSetup = () => {
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
-            <div className="relative flex items-center justify-center transition-transform hover:scale-105 duration-300">
+            <div className="relative flex items-center justify-center">
               <img
                 src={logo}
                 alt="لاعج - Laeij"
-                className="h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 object-contain transition-all duration-300 hover:brightness-110 hover:drop-shadow-2xl filter drop-shadow-xl"
+                className="h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 object-contain filter drop-shadow-xl"
                 loading="eager"
                 onError={(e) => {
                   e.target.style.display = "none";
@@ -62,35 +65,35 @@ const ProfileSetup = () => {
           onSubmit={handleSubmit}
           className={`${panelClasses} rounded-2xl p-8 md:p-10 space-y-6 shadow-2xl backdrop-blur`}
         >
-          <p className="text-secondary text-center text-lg mb-6">أكمل بياناتك</p>
+          <p className={`text-secondary text-center text-lg mb-6 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>{t("profileSetup.title")}</p>
 
           <div>
-            <label className="block text-primary text-sm mb-2">الإسم</label>
+            <label className={`block text-primary text-sm mb-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>{t("profileSetup.name")}</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="أكتب اسمك"
+              placeholder={t("profileSetup.namePlaceholder")}
               className={`w-full rounded-xl px-4 py-3 focus:outline-none focus:ring-4 focus:ring-luxury-gold/30 ${inputClasses}`}
               required
             />
           </div>
 
           <div>
-            <label className="block text-primary text-sm mb-2">البريد الإلكتروني</label>
+            <label className={`block text-primary text-sm mb-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>{t("profileSetup.email")}</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="أكتب بريدك الإلكتروني (إختباري)"
+              placeholder={t("profileSetup.emailPlaceholder")}
               className={`w-full rounded-xl px-4 py-3 focus:outline-none focus:ring-4 focus:ring-luxury-gold/30 ${inputClasses}`}
             />
           </div>
 
           <div>
-            <label className="block text-primary text-sm mb-2">تاريخ الميلاد</label>
+            <label className={`block text-primary text-sm mb-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>{t("profileSetup.dateOfBirth")}</label>
             <input
               type="date"
               name="dateOfBirth"
@@ -105,12 +108,12 @@ const ProfileSetup = () => {
             type="submit"
             className="w-full bg-gradient-to-r from-luxury-gold to-luxury-gold-dark text-luxury-brown-darker py-4 rounded-xl font-semibold text-lg hover:from-luxury-gold-light hover:to-luxury-gold transition-all shadow-lg focus:outline-none focus:ring-4 focus:ring-luxury-gold/50"
           >
-            تأكيد البيانات
+            {t("profileSetup.confirm")}
           </button>
         </form>
 
-        <p className="text-muted text-sm text-center mt-6">
-          باستمرارك، أنت توافق على سياسة الخصوصية وشروط الاستخدام.
+        <p className={`text-muted text-sm text-center mt-6 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+          {t("profileSetup.terms")}
         </p>
       </div>
     </div>

@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 import logo from "../assets/logo.png";
 
 const Login = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("login"); // login, signup, forgot
   const navigate = useNavigate();
   const { isDark } = useTheme();
@@ -75,18 +78,18 @@ const Login = () => {
     const errors = {};
 
     if (!loginData.email.trim()) {
-      errors.email = "البريد الإلكتروني أو رقم الجوال مطلوب";
+      errors.email = t("login.emailOrPhoneRequired");
     } else if (
       !validateEmail(loginData.email) &&
       !validatePhone(loginData.email)
     ) {
-      errors.email = "البريد الإلكتروني أو رقم الجوال غير صحيح";
+      errors.email = t("login.emailOrPhoneInvalid");
     }
 
     if (!loginData.password) {
-      errors.password = "كلمة المرور مطلوبة";
+      errors.password = t("login.passwordRequired");
     } else if (loginData.password.length < 6) {
-      errors.password = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+      errors.password = t("login.passwordMinLength6");
     }
 
     setLoginErrors(errors);
@@ -98,37 +101,37 @@ const Login = () => {
     const errors = {};
 
     if (!signupData.name.trim()) {
-      errors.name = "الاسم مطلوب";
+      errors.name = t("login.nameRequired");
     } else if (!validateName(signupData.name)) {
-      errors.name = "الاسم يجب أن يكون حرفين على الأقل";
+      errors.name = t("login.nameMinLength");
     }
 
     if (!signupData.email.trim()) {
-      errors.email = "البريد الإلكتروني مطلوب";
+      errors.email = t("login.emailRequired");
     } else if (!validateEmail(signupData.email)) {
-      errors.email = "البريد الإلكتروني غير صحيح";
+      errors.email = t("login.invalidEmail");
     }
 
     if (!signupData.phone.trim()) {
-      errors.phone = "رقم الجوال مطلوب";
+      errors.phone = t("login.phoneRequired");
     } else if (!validatePhone(signupData.phone)) {
-      errors.phone = "رقم الجوال غير صحيح";
+      errors.phone = t("login.phoneInvalid");
     }
 
     if (!signupData.password) {
-      errors.password = "كلمة المرور مطلوبة";
+      errors.password = t("login.passwordRequired");
     } else if (!validatePassword(signupData.password)) {
-      errors.password = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+      errors.password = t("login.passwordMinLengthSignup");
     }
 
     if (!signupData.confirmPassword) {
-      errors.confirmPassword = "تأكيد كلمة المرور مطلوب";
+      errors.confirmPassword = t("login.confirmPasswordRequired");
     } else if (signupData.password !== signupData.confirmPassword) {
-      errors.confirmPassword = "كلمات المرور غير متطابقة";
+      errors.confirmPassword = t("login.passwordsDoNotMatch");
     }
 
     if (!signupData.agreeToTerms) {
-      errors.agreeToTerms = "يجب الموافقة على الشروط والأحكام";
+      errors.agreeToTerms = t("login.mustAgreeToTerms");
     }
 
     setSignupErrors(errors);
@@ -139,7 +142,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!validateLogin()) {
-      showToast("يرجى تصحيح الأخطاء في النموذج", "error");
+      showToast(t("login.formErrors"), "error");
       return;
     }
 
@@ -158,10 +161,10 @@ const Login = () => {
           localStorage.removeItem("rememberedEmail");
         }
         
-        showToast("تم تسجيل الدخول بنجاح!", "success");
+        showToast(t("login.loginSuccess"), "success");
         setTimeout(() => navigate("/"), 500);
       } else {
-        showToast(result.message || "فشل تسجيل الدخول", "error");
+        showToast(result.message || t("login.loginFailed"), "error");
       }
     }, 1000);
   };
@@ -170,7 +173,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!validateSignup()) {
-      showToast("يرجى تصحيح الأخطاء في النموذج", "error");
+      showToast(t("login.formErrors"), "error");
       return;
     }
 
@@ -188,7 +191,7 @@ const Login = () => {
       setIsLoading(false);
 
       if (result.success) {
-        showToast("تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول", "success");
+        showToast(t("login.accountCreated"), "success");
         // Clear signup form
         setSignupData({
           name: "",
@@ -206,7 +209,7 @@ const Login = () => {
           password: "",
         });
       } else {
-        showToast(result.message || "فشل إنشاء الحساب", "error");
+        showToast(result.message || t("login.accountFailed"), "error");
       }
     }, 1000);
   };
@@ -215,12 +218,12 @@ const Login = () => {
     e.preventDefault();
 
     if (!forgotPasswordData.email.trim()) {
-      setForgotPasswordError("البريد الإلكتروني مطلوب");
+      setForgotPasswordError(t("login.emailRequired"));
       return;
     }
 
     if (!validateEmail(forgotPasswordData.email)) {
-      setForgotPasswordError("البريد الإلكتروني غير صحيح");
+      setForgotPasswordError(t("login.invalidEmail"));
       return;
     }
 
@@ -231,7 +234,7 @@ const Login = () => {
     setTimeout(() => {
       setIsLoading(false);
       showToast(
-        "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني",
+        t("login.resetLinkSent"),
         "success"
       );
       setActiveTab("login");
@@ -271,11 +274,11 @@ const Login = () => {
         <div className="relative z-10 flex flex-col items-center justify-center p-12 xl:p-16 text-white w-full">
           <div className="max-w-lg text-center">
             <div className="mb-8 flex justify-center">
-              <div className="relative flex items-center justify-center transition-transform hover:scale-105 duration-300">
+              <div className="relative flex items-center justify-center">
                 <img
                   src={logo}
-                  alt="لاعج - Laeij"
-                  className="h-32 w-32 xl:h-40 xl:w-40 object-contain transition-all duration-300 hover:brightness-110 hover:drop-shadow-2xl filter drop-shadow-xl"
+                  alt="Laeij"
+                  className="h-32 w-32 xl:h-40 xl:w-40 object-contain filter drop-shadow-xl"
                   loading="eager"
                   onError={(e) => {
                     e.target.style.display = "none";
@@ -285,16 +288,16 @@ const Login = () => {
                 <div className="text-8xl xl:text-9xl hidden">🐴</div>
               </div>
             </div>
-            <h1 className="text-4xl xl:text-5xl font-bold mb-6 drop-shadow-2xl">
-              مرحباً بك في لاعج
+            <h1 className={`text-4xl xl:text-5xl font-bold mb-6 drop-shadow-2xl ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+              {t("login.welcomeToLaeij")}
             </h1>
-            <p className="text-xl xl:text-2xl opacity-90 leading-relaxed drop-shadow-lg mb-8">
-              اكتشف عالماً من العطور الفاخرة والزيوت الطبيعية
+            <p className={`text-xl xl:text-2xl opacity-90 leading-relaxed drop-shadow-lg mb-8 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+              {t("login.discoverWorld")}
             </p>
-            <div className="flex flex-col gap-4 text-lg opacity-80">
-              <div className="flex items-center gap-3 justify-center">
+            <div className={`flex flex-col gap-4 text-lg opacity-80 ${i18n.language === "ar" ? "items-end" : "items-start"}`}>
+              <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                 <svg
-                  className="w-6 h-6 text-luxury-gold-light"
+                  className="w-6 h-6 text-luxury-gold-light flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -306,11 +309,11 @@ const Login = () => {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>عطور حصرية بإصدارات محدودة</span>
+                <span>{t("login.exclusivePerfumes")}</span>
               </div>
-              <div className="flex items-center gap-3 justify-center">
+              <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                 <svg
-                  className="w-6 h-6 text-luxury-gold-light"
+                  className="w-6 h-6 text-luxury-gold-light flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -322,11 +325,11 @@ const Login = () => {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>زيوت طبيعية نقية</span>
+                <span>{t("login.naturalOils")}</span>
               </div>
-              <div className="flex items-center gap-3 justify-center">
+              <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                 <svg
-                  className="w-6 h-6 text-luxury-gold-light"
+                  className="w-6 h-6 text-luxury-gold-light flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -338,7 +341,7 @@ const Login = () => {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>توصيل سريع وآمن</span>
+                <span>{t("login.fastSecureDelivery")}</span>
               </div>
             </div>
           </div>
@@ -356,11 +359,11 @@ const Login = () => {
           {/* Logo for Mobile/Tablet */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex items-center justify-center mb-4">
-              <div className="relative flex items-center justify-center transition-transform hover:scale-105 duration-300">
+              <div className="relative flex items-center justify-center">
                 <img
                   src={logo}
-                  alt="لاعج - Laeij"
-                  className="h-20 w-20 md:h-24 md:w-24 object-contain transition-all duration-300 hover:brightness-110 hover:drop-shadow-2xl filter drop-shadow-xl"
+                  alt="Laeij"
+                  className="h-20 w-20 md:h-24 md:w-24 object-contain filter drop-shadow-xl"
                   loading="eager"
                   onError={(e) => {
                     e.target.style.display = "none";
@@ -373,30 +376,29 @@ const Login = () => {
           </div>
 
           {/* Welcome Text */}
-          <div className="mb-8 lg:mb-10">
+          <div className={`mb-8 lg:mb-10 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
             <h2
               className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${
                 isDark ? "text-white" : "text-luxury-brown-text"
               }`}
             >
-              {activeTab === "login" && "مرحباً بعودتك"}
-              {activeTab === "signup" && "إنشاء حساب جديد"}
-              {activeTab === "forgot" && "إعادة تعيين كلمة المرور"}
+              {activeTab === "login" && t("login.welcomeBack")}
+              {activeTab === "signup" && t("login.createAccount")}
+              {activeTab === "forgot" && t("login.resetPassword")}
             </h2>
             <p
               className={`text-lg md:text-xl ${
                 isDark ? "text-luxury-brown-light" : "text-luxury-brown-text/70"
               }`}
             >
-              {activeTab === "login" && "سجل دخولك للوصول إلى حسابك"}
-              {activeTab === "signup" && "انضم إلينا وابدأ رحلتك معنا"}
-              {activeTab === "forgot" &&
-                "أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور"}
+              {activeTab === "login" && t("login.loginDesc")}
+              {activeTab === "signup" && t("login.signupDesc")}
+              {activeTab === "forgot" && t("login.forgotDesc")}
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-8 bg-card-muted p-1.5 rounded-2xl border-2 border-card">
+          <div className={`flex gap-2 mb-8 bg-card-muted p-1.5 rounded-2xl border-2 border-card ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
             <button
               onClick={() => setActiveTab("login")}
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${
@@ -409,7 +411,7 @@ const Login = () => {
                   : "text-luxury-brown-text hover:bg-card hover:text-luxury-gold"
               }`}
             >
-              تسجيل الدخول
+              {t("login.loginTab")}
             </button>
             <button
               onClick={() => setActiveTab("signup")}
@@ -423,7 +425,7 @@ const Login = () => {
                   : "text-luxury-brown-text hover:bg-card hover:text-luxury-gold"
               }`}
             >
-              إنشاء حساب
+              {t("login.signupTab")}
             </button>
           </div>
 
@@ -439,9 +441,9 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  البريد الإلكتروني أو رقم الجوال
+                  {t("login.emailOrPhone")}
                 </label>
                 <input
                   type="text"
@@ -460,36 +462,37 @@ const Login = () => {
                     ) {
                       setLoginErrors({
                         ...loginErrors,
-                        email: "البريد الإلكتروني أو رقم الجوال غير صحيح",
+                        email: t("login.emailOrPhoneInvalid"),
                       });
                     }
                   }}
-                  placeholder="example@email.com أو 56 123 4567"
+                  placeholder={t("login.emailOrPhonePlaceholder")}
+                  dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   className={`w-full px-5 py-4 rounded-2xl text-lg transition-all ${
                     loginErrors.email
                       ? isDark
                         ? "bg-card-muted text-primary placeholder-luxury-brown-light/60 border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/30"
                         : "bg-white text-luxury-brown-text placeholder-luxury-brown-text/60 border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/30"
                       : inputClasses
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 />
                 {loginErrors.email && (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                     {loginErrors.email}
                   </p>
                 )}
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-3">
+                <div className={`flex items-center justify-between mb-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                   <label
                     className={`block text-base md:text-lg font-semibold ${
                       isDark
                         ? "text-luxury-brown-light"
                         : "text-luxury-brown-text"
-                    }`}
+                    } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                   >
-                    كلمة المرور
+                    {t("login.password")}
                   </label>
                   <button
                     type="button"
@@ -500,7 +503,7 @@ const Login = () => {
                         : "text-amber-600 hover:text-amber-700"
                     }`}
                   >
-                    نسيت كلمة المرور؟
+                    {t("login.forgotPassword")}
                   </button>
                 </div>
                 <input
@@ -516,27 +519,28 @@ const Login = () => {
                     if (loginData.password && loginData.password.length < 6) {
                       setLoginErrors({
                         ...loginErrors,
-                        password: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+                        password: t("login.passwordMinLength6"),
                       });
                     }
                   }}
-                  placeholder="أدخل كلمة المرور"
+                  placeholder={t("login.passwordPlaceholder")}
+                  dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   className={`w-full px-5 py-4 rounded-2xl text-lg transition-all ${
                     loginErrors.password
                       ? isDark
                         ? "bg-card-muted text-primary placeholder-luxury-brown-light/60 border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/30"
                         : "bg-white text-luxury-brown-text placeholder-luxury-brown-text/60 border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/30"
                       : inputClasses
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 />
                 {loginErrors.password && (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                     {loginErrors.password}
                   </p>
                 )}
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                 <input
                   type="checkbox"
                   id="remember"
@@ -550,9 +554,9 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  تذكرني
+                  {t("login.rememberMe")}
                 </label>
               </div>
 
@@ -565,7 +569,7 @@ const Login = () => {
                     : "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500 text-white border-amber-700 shadow-amber-900/50"
                 }`}
               >
-                {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+                {isLoading ? t("login.loadingLogin") : t("login.login")}
               </button>
             </form>
           )}
@@ -582,9 +586,9 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  الاسم الكامل
+                  {t("login.fullName")}
                 </label>
                 <input
                   type="text"
@@ -599,21 +603,22 @@ const Login = () => {
                     if (signupData.name && !validateName(signupData.name)) {
                       setSignupErrors({
                         ...signupErrors,
-                        name: "الاسم يجب أن يكون حرفين على الأقل",
+                        name: t("login.nameMinLength"),
                       });
                     }
                   }}
-                  placeholder="أدخل اسمك الكامل"
+                  placeholder={t("login.fullNamePlaceholder")}
+                  dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   className={`w-full px-5 py-4 rounded-2xl text-lg transition-all ${
                     signupErrors.name
                       ? isDark
                         ? "bg-card-muted text-primary placeholder-luxury-brown-light/60 border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/30"
                         : "bg-white text-luxury-brown-text placeholder-luxury-brown-text/60 border-2 border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/30"
                       : inputClasses
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 />
                 {signupErrors.name && (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                     {signupErrors.name}
                   </p>
                 )}
@@ -625,9 +630,9 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  البريد الإلكتروني
+                  {t("login.email")}
                 </label>
                 <input
                   type="email"
@@ -642,11 +647,12 @@ const Login = () => {
                     if (signupData.email && !validateEmail(signupData.email)) {
                       setSignupErrors({
                         ...signupErrors,
-                        email: "البريد الإلكتروني غير صحيح",
+                        email: t("login.invalidEmail"),
                       });
                     }
                   }}
                   placeholder="example@email.com"
+                  dir="ltr"
                   className={`w-full px-5 py-4 rounded-2xl text-lg transition-all ${
                     signupErrors.email
                       ? isDark
@@ -656,7 +662,7 @@ const Login = () => {
                   }`}
                 />
                 {signupErrors.email && (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                     {signupErrors.email}
                   </p>
                 )}
@@ -668,19 +674,21 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  رقم الجوال
+                  {t("login.phoneNumber")}
                 </label>
                 <div
                   className={`flex items-center rounded-2xl overflow-hidden border-2 transition-all focus-within:border-luxury-gold focus-within:ring-4 focus-within:ring-luxury-gold/30 ${
                     isDark
                       ? "border-card bg-card-muted"
                       : "border-luxury-gold-light/50 bg-white"
-                  }`}
+                  } ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}
                 >
                   <div
-                    className={`px-5 py-4 flex items-center gap-3 border-l-2 ${
+                    className={`px-5 py-4 flex items-center gap-3 ${
+                      i18n.language === "ar" ? "border-r-2" : "border-l-2"
+                    } ${
                       isDark
                         ? "bg-card-muted text-luxury-brown-light border-card"
                         : "bg-luxury-cream text-luxury-brown-text border-luxury-gold-light/50"
@@ -705,11 +713,12 @@ const Login = () => {
                       ) {
                         setSignupErrors({
                           ...signupErrors,
-                          phone: "رقم الجوال غير صحيح",
+                          phone: t("login.phoneInvalid"),
                         });
                       }
                     }}
-                    placeholder="56 123 4567"
+                    placeholder={t("login.phonePlaceholder")}
+                    dir="ltr"
                     className={`flex-1 px-5 py-4 border-0 focus:outline-none text-lg ${
                       signupErrors.phone
                         ? isDark
@@ -720,7 +729,7 @@ const Login = () => {
                   />
                 </div>
                 {signupErrors.phone && (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                     {signupErrors.phone}
                   </p>
                 )}
@@ -732,9 +741,9 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  كلمة المرور
+                  {t("login.password")}
                 </label>
                 <input
                   type="password"
@@ -750,7 +759,7 @@ const Login = () => {
                     ) {
                       setSignupErrors({
                         ...signupErrors,
-                        confirmPassword: "كلمات المرور غير متطابقة",
+                        confirmPassword: t("login.passwordsDoNotMatch"),
                       });
                     } else if (
                       signupData.confirmPassword &&
@@ -766,11 +775,12 @@ const Login = () => {
                     ) {
                       setSignupErrors({
                         ...signupErrors,
-                        password: "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
+                        password: t("login.passwordMinLengthSignup"),
                       });
                     }
                   }}
-                  placeholder="أدخل كلمة مرور قوية"
+                  placeholder={t("login.passwordPlaceholderSignup")}
+                  dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   className={`w-full px-5 py-4 rounded-2xl text-lg transition-all ${
                     signupErrors.password
                       ? isDark
@@ -780,7 +790,7 @@ const Login = () => {
                   }`}
                 />
                 {signupErrors.password ? (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                     {signupErrors.password}
                   </p>
                 ) : (
@@ -789,9 +799,9 @@ const Login = () => {
                       isDark
                         ? "text-luxury-brown-light/70"
                         : "text-luxury-brown-text/60"
-                    }`}
+                    } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                   >
-                    يجب أن تكون 8 أحرف على الأقل
+                    {t("login.passwordMinLengthHint")}
                   </p>
                 )}
               </div>
@@ -802,9 +812,9 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  تأكيد كلمة المرور
+                  {t("login.confirmPassword")}
                 </label>
                 <input
                   type="password"
@@ -823,7 +833,7 @@ const Login = () => {
                       } else {
                         setSignupErrors({
                           ...signupErrors,
-                          confirmPassword: "كلمات المرور غير متطابقة",
+                          confirmPassword: t("login.passwordsDoNotMatch"),
                         });
                       }
                     }
@@ -835,11 +845,12 @@ const Login = () => {
                     ) {
                       setSignupErrors({
                         ...signupErrors,
-                        confirmPassword: "كلمات المرور غير متطابقة",
+                        confirmPassword: t("login.passwordsDoNotMatch"),
                       });
                     }
                   }}
-                  placeholder="أعد إدخال كلمة المرور"
+                  placeholder={t("login.confirmPasswordPlaceholder")}
+                  dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   className={`w-full px-5 py-4 rounded-2xl text-lg transition-all ${
                     signupErrors.confirmPassword
                       ? isDark
@@ -849,13 +860,13 @@ const Login = () => {
                   }`}
                 />
                 {signupErrors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                     {signupErrors.confirmPassword}
                   </p>
                 )}
               </div>
 
-              <div className="flex items-start gap-3">
+              <div className={`flex items-start gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                 <input
                   type="checkbox"
                   id="agree"
@@ -879,23 +890,23 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  أوافق على{" "}
+                  {t("login.agreeToTerms")}{" "}
                   <a href="/terms" className="text-luxury-gold hover:underline">
-                    شروط الاستخدام
+                    {t("login.termsOfUse")}
                   </a>{" "}
-                  و{" "}
+                  {t("login.and")}{" "}
                   <a
                     href="/privacy"
                     className="text-luxury-gold hover:underline"
                   >
-                    سياسة الخصوصية
+                    {t("login.privacyPolicy")}
                   </a>
                 </label>
               </div>
               {signupErrors.agreeToTerms && (
-                <p className="text-red-500 text-sm -mt-2">
+                <p className={`text-red-500 text-sm -mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                   {signupErrors.agreeToTerms}
                 </p>
               )}
@@ -909,7 +920,7 @@ const Login = () => {
                     : "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500 text-white border-amber-700 shadow-amber-900/50"
                 }`}
               >
-                {isLoading ? "جاري إنشاء الحساب..." : "إنشاء حساب"}
+                {isLoading ? t("login.loadingSignup") : t("login.signup")}
               </button>
             </form>
           )}
@@ -926,9 +937,9 @@ const Login = () => {
                     isDark
                       ? "text-luxury-brown-light"
                       : "text-luxury-brown-text"
-                  }`}
+                  } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 >
-                  البريد الإلكتروني
+                  {t("login.email")}
                 </label>
                 <input
                   type="email"
@@ -942,10 +953,11 @@ const Login = () => {
                       forgotPasswordData.email &&
                       !validateEmail(forgotPasswordData.email)
                     ) {
-                      setForgotPasswordError("البريد الإلكتروني غير صحيح");
+                      setForgotPasswordError(t("login.invalidEmail"));
                     }
                   }}
                   placeholder="example@email.com"
+                  dir="ltr"
                   className={`w-full px-5 py-4 rounded-2xl text-lg transition-all ${
                     forgotPasswordError
                       ? isDark
@@ -955,7 +967,7 @@ const Login = () => {
                   }`}
                 />
                 {forgotPasswordError ? (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                     {forgotPasswordError}
                   </p>
                 ) : (
@@ -964,9 +976,9 @@ const Login = () => {
                       isDark
                         ? "text-luxury-brown-light/70"
                         : "text-luxury-brown-text/60"
-                    }`}
+                    } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                   >
-                    سنرسل رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني
+                    {t("login.resetLinkMessage")}
                   </p>
                 )}
               </div>
@@ -980,7 +992,7 @@ const Login = () => {
                     : "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500 text-white border-amber-700 shadow-amber-900/50"
                 }`}
               >
-                {isLoading ? "جاري الإرسال..." : "إرسال رابط إعادة التعيين"}
+                {isLoading ? t("login.loadingSend") : t("login.sendResetLink")}
               </button>
 
               <button
@@ -992,7 +1004,7 @@ const Login = () => {
                     : "border-luxury-gold-light/50 text-luxury-brown-text hover:bg-card-muted hover:border-luxury-gold-light/70"
                 }`}
               >
-                العودة لتسجيل الدخول
+                {t("login.backToLogin")}
               </button>
             </form>
           )}
@@ -1008,7 +1020,7 @@ const Login = () => {
             >
               {activeTab === "login" ? (
                 <>
-                  ليس لديك حساب؟{" "}
+                  {t("login.noAccount")}{" "}
                   <button
                     onClick={() => setActiveTab("signup")}
                     className={`font-bold underline transition-colors ${
@@ -1017,12 +1029,12 @@ const Login = () => {
                         : "text-amber-600 hover:text-amber-700"
                     }`}
                   >
-                    إنشاء حساب جديد
+                    {t("login.createNewAccount")}
                   </button>
                 </>
               ) : (
                 <>
-                  لديك حساب بالفعل؟{" "}
+                  {t("login.alreadyHaveAccount")}{" "}
                   <button
                     onClick={() => setActiveTab("login")}
                     className={`font-bold underline transition-colors ${
@@ -1031,7 +1043,7 @@ const Login = () => {
                         : "text-amber-600 hover:text-amber-700"
                     }`}
                   >
-                    تسجيل الدخول
+                    {t("login.login")}
                   </button>
                 </>
               )}

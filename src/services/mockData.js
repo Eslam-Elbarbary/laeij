@@ -7,6 +7,7 @@ export const mockCategories = [
     name: "العطور",
     nameEn: "Perfumes",
     description: "عبق ملكي.... يروي حكاية فخامة لاعج.",
+    descriptionEn: "Royal fragrance... tells the tale of Laeij's luxury.",
     productCount: 24,
     icon: "🌸",
     image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&h=600&fit=crop&q=80&auto=format",
@@ -17,6 +18,7 @@ export const mockCategories = [
     name: "الزيوت",
     nameEn: "Oils",
     description: "نقاء الأصالة... زيوت طبيعية وخلطات حصرية تعكس رفاهية لاعج.",
+    descriptionEn: "Purity of authenticity... natural oils and exclusive blends reflecting Laeij's luxury.",
     productCount: 12,
     icon: "💧",
     image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=800&h=600&fit=crop&q=80&auto=format",
@@ -27,6 +29,7 @@ export const mockCategories = [
     name: "العود",
     nameEn: "Oud",
     description: "كلما زاد الجمر لهبا... أهدى العود عبق الملوك.",
+    descriptionEn: "As the ember glows brighter... oud offers the fragrance of kings.",
     productCount: 12,
     icon: "🪵",
     image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=800&h=600&fit=crop&q=80&auto=format",
@@ -37,6 +40,7 @@ export const mockCategories = [
     name: "قسم الهدايا",
     nameEn: "Gifts",
     description: "هدايا فاخرة... صممت بعناية لتروي حكاية فخامة تليق بكل مناسبة",
+    descriptionEn: "Luxury gifts... carefully designed to tell a tale of luxury suitable for every occasion",
     productCount: 45,
     icon: "🎁",
     image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=600&fit=crop&q=80&auto=format",
@@ -47,6 +51,7 @@ export const mockCategories = [
     name: "إشراقة الطبيعة",
     nameEn: "Nature's Glow",
     description: "نقاء الطبيعة... يلتقي بالفخامة ليمنحك إشراقة استثنائية.",
+    descriptionEn: "Nature's purity... meets luxury to give you an exceptional glow.",
     productCount: 12,
     icon: "🌿",
     image: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=800&h=600&fit=crop&q=80&auto=format",
@@ -57,6 +62,7 @@ export const mockCategories = [
     name: "الأزياء",
     nameEn: "Fashion",
     description: "أناقة ملكية... تصاميم تنبض بالفخامة وتروي حكاية تفرد.",
+    descriptionEn: "Royal elegance... designs that pulse with luxury and tell a tale of uniqueness.",
     productCount: 45,
     icon: "👗",
     image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop&q=80&auto=format",
@@ -70,6 +76,7 @@ export const mockProducts = [
     name: "عطر لاعج الملكي",
     nameEn: "Laeij Royal Perfume",
     description: "عطر فاخر يجمع بين روائح العود الأصيل والورد الجوري، ليخلق تجربة عطرية استثنائية تليق بالملوك.",
+    descriptionEn: "A luxurious perfume that combines authentic oud and damask rose scents, creating an exceptional aromatic experience fit for royalty.",
     category: "العطور",
     categoryId: 1,
     size: "30 جم",
@@ -88,6 +95,7 @@ export const mockProducts = [
     name: "زيت العود الكمبودي",
     nameEn: "Cambodian Oud Oil",
     description: "زيت عود كمبودي أصيل من أجود الأنواع، يتميز بعبقه القوي والفريد الذي يدوم لساعات طويلة.",
+    descriptionEn: "Authentic Cambodian oud oil from the finest varieties, distinguished by its strong and unique fragrance that lasts for hours.",
     category: "الزيوت",
     categoryId: 2,
     size: "12 مل",
@@ -106,6 +114,7 @@ export const mockProducts = [
     name: "عود هندي أصيل",
     nameEn: "Authentic Indian Oud",
     description: "عود هندي أصيل من أجود المصادر، يتميز برائحته الدافئة والعطرية التي تملأ المكان.",
+    descriptionEn: "Authentic Indian oud from the finest sources, distinguished by its warm and aromatic scent that fills the space.",
     category: "العود",
     categoryId: 3,
     size: "25 جم",
@@ -124,6 +133,7 @@ export const mockProducts = [
     name: "عطر الورد الساحر",
     nameEn: "Enchanting Rose Perfume",
     description: "عطر يجمع بين نعومة الورد الجوري ودفء العود، ليخلق رائحة ساحرة لا تُقاوم.",
+    descriptionEn: "A perfume that combines the softness of damask rose with the warmth of oud, creating an irresistible enchanting fragrance.",
     category: "العطور",
     categoryId: 1,
     size: "50 جم",
@@ -142,6 +152,7 @@ export const mockProducts = [
     name: "زيت الياسمين النقي",
     nameEn: "Pure Jasmine Oil",
     description: "زيت ياسمين نقي 100%، مستخلص من أجود أنواع الياسمين، يتميز برائحته العطرية الفريدة.",
+    descriptionEn: "100% pure jasmine oil, extracted from the finest types of jasmine, distinguished by its unique aromatic fragrance.",
     category: "الزيوت",
     categoryId: 2,
     size: "15 مل",
@@ -160,6 +171,7 @@ export const mockProducts = [
     name: "عود كمبودي ملكي",
     nameEn: "Royal Cambodian Oud",
     description: "عود كمبودي من الدرجة الأولى، يتميز بجودته العالية وعبقه الفاخر الذي يدوم طويلاً.",
+    descriptionEn: "First-grade Cambodian oud, distinguished by its high quality and luxurious fragrance that lasts long.",
     category: "العود",
     categoryId: 3,
     size: "30 جم",
@@ -178,6 +190,7 @@ export const mockProducts = [
     name: "عطر الفانيليا الدافئ",
     nameEn: "Warm Vanilla Perfume",
     description: "عطر يجمع بين دفء الفانيليا ونعومة الزهور، ليخلق رائحة دافئة ومريحة.",
+    descriptionEn: "A perfume that combines the warmth of vanilla with the softness of flowers, creating a warm and comforting fragrance.",
     category: "العطور",
     categoryId: 1,
     size: "30 جم",
@@ -196,6 +209,7 @@ export const mockProducts = [
     name: "زيت اللافندر العطري",
     nameEn: "Aromatic Lavender Oil",
     description: "زيت لافندر طبيعي 100%، يساعد على الاسترخاء والهدوء، برائحة عطرية مميزة.",
+    descriptionEn: "100% natural lavender oil, helps with relaxation and calmness, with a distinctive aromatic fragrance.",
     category: "الزيوت",
     categoryId: 2,
     size: "10 مل",
@@ -214,6 +228,7 @@ export const mockProducts = [
     name: "عود عماني أصيل",
     nameEn: "Authentic Omani Oud",
     description: "عود عماني من أجود الأنواع، يتميز برائحته القوية والعميقة التي تترك أثراً لا يُنسى.",
+    descriptionEn: "Omani oud from the finest varieties, distinguished by its strong and deep fragrance that leaves an unforgettable impression.",
     category: "العود",
     categoryId: 3,
     size: "20 جم",
@@ -232,6 +247,7 @@ export const mockProducts = [
     name: "عطر المسك الأسود",
     nameEn: "Black Musk Perfume",
     description: "عطر يجمع بين قوة المسك الأسود ونعومة الزهور البيضاء، ليخلق رائحة جذابة ومثيرة.",
+    descriptionEn: "A perfume that combines the power of black musk with the softness of white flowers, creating an attractive and exciting fragrance.",
     category: "العطور",
     categoryId: 1,
     size: "50 جم",
@@ -250,6 +266,7 @@ export const mockProducts = [
     name: "زيت الورد الجوري",
     nameEn: "Damask Rose Oil",
     description: "زيت ورد جوري نقي من أجود الأنواع، يتميز برائحته العطرية الفاخرة والرومانسية.",
+    descriptionEn: "Pure damask rose oil from the finest varieties, distinguished by its luxurious and romantic aromatic fragrance.",
     category: "الزيوت",
     categoryId: 2,
     size: "12 مل",
@@ -268,6 +285,7 @@ export const mockProducts = [
     name: "عود تايلاندي فاخر",
     nameEn: "Luxury Thai Oud",
     description: "عود تايلاندي من الدرجة الممتازة، يتميز بجودته العالية وعبقه الفريد الذي يدوم لساعات.",
+    descriptionEn: "Premium-grade Thai oud, distinguished by its high quality and unique fragrance that lasts for hours.",
     category: "العود",
     categoryId: 3,
     size: "25 جم",
@@ -286,6 +304,7 @@ export const mockProducts = [
     name: "عطر الحمضيات المنعش",
     nameEn: "Fresh Citrus Perfume",
     description: "عطر منعش يجمع بين نضارة الحمضيات ودفء التوابل، مثالي للاستخدام اليومي.",
+    descriptionEn: "A refreshing perfume that combines the freshness of citrus with the warmth of spices, perfect for daily use.",
     category: "العطور",
     categoryId: 1,
     size: "30 جم",
@@ -304,6 +323,7 @@ export const mockProducts = [
     name: "زيت النعناع المنعش",
     nameEn: "Refreshing Mint Oil",
     description: "زيت نعناع طبيعي 100%، يتميز برائحته المنعشة والقوية التي تمنحك النشاط والحيوية.",
+    descriptionEn: "100% natural mint oil, distinguished by its refreshing and strong fragrance that gives you energy and vitality.",
     category: "الزيوت",
     categoryId: 2,
     size: "10 مل",
@@ -322,6 +342,7 @@ export const mockProducts = [
     name: "عود ملكي فاخر",
     nameEn: "Royal Luxury Oud",
     description: "عود ملكي من أجود الأنواع، يتميز بجودته الاستثنائية وعبقه الفاخر الذي يليق بالملوك.",
+    descriptionEn: "Royal oud from the finest varieties, distinguished by its exceptional quality and luxurious fragrance fit for royalty.",
     category: "العود",
     categoryId: 3,
     size: "35 جم",
@@ -340,6 +361,7 @@ export const mockProducts = [
     name: "عطر الياسمين الأبيض",
     nameEn: "White Jasmine Perfume",
     description: "عطر يجمع بين نعومة الياسمين الأبيض ودفء العود، ليخلق رائحة رومانسية وجذابة.",
+    descriptionEn: "A perfume that combines the softness of white jasmine with the warmth of oud, creating a romantic and attractive fragrance.",
     category: "العطور",
     categoryId: 1,
     size: "50 جم",
@@ -358,6 +380,7 @@ export const mockProducts = [
     name: "زيت الصندل الدافئ",
     nameEn: "Warm Sandalwood Oil",
     description: "زيت صندل طبيعي من أجود الأنواع، يتميز برائحته الدافئة والخشبية الفريدة.",
+    descriptionEn: "Natural sandalwood oil from the finest varieties, distinguished by its warm and unique woody fragrance.",
     category: "الزيوت",
     categoryId: 2,
     size: "15 مل",
@@ -376,6 +399,7 @@ export const mockProducts = [
     name: "عود أفريقي أصيل",
     nameEn: "Authentic African Oud",
     description: "عود أفريقي من أجود المصادر، يتميز برائحته القوية والعميقة التي تترك أثراً مميزاً.",
+    descriptionEn: "Authentic African oud from the finest sources, distinguished by its strong and deep fragrance that leaves a distinctive impression.",
     category: "العود",
     categoryId: 3,
     size: "20 جم",
@@ -464,7 +488,8 @@ export const api = {
         (p) =>
           p.name.toLowerCase().includes(searchTerm) ||
           p.nameEn.toLowerCase().includes(searchTerm) ||
-          p.description.toLowerCase().includes(searchTerm)
+          (p.description && p.description.toLowerCase().includes(searchTerm)) ||
+          (p.descriptionEn && p.descriptionEn.toLowerCase().includes(searchTerm))
       );
     }
 
@@ -566,7 +591,8 @@ export const api = {
       (p) =>
         p.name.toLowerCase().includes(searchTerm) ||
         p.nameEn.toLowerCase().includes(searchTerm) ||
-        p.description.toLowerCase().includes(searchTerm) ||
+        (p.description && p.description.toLowerCase().includes(searchTerm)) ||
+        (p.descriptionEn && p.descriptionEn.toLowerCase().includes(searchTerm)) ||
         p.category.toLowerCase().includes(searchTerm)
     );
     return {

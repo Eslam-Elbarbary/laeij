@@ -5,6 +5,8 @@ import { useCart } from "../contexts/CartContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 import PageLayout from "../components/PageLayout";
 import ProductCard from "../components/ProductCard";
 
@@ -15,16 +17,17 @@ const Wishlist = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const hasShownToast = useRef(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated && !hasShownToast.current) {
       hasShownToast.current = true;
-      showToast("يرجى تسجيل الدخول لعرض قائمة الأمنيات", "error");
+      showToast(t("wishlist.pleaseLogin"), "error");
       navigate("/login");
     }
-  }, [isAuthenticated, navigate, showToast]);
+  }, [isAuthenticated, navigate, showToast, t]);
 
   // Don't render if not authenticated
   if (!isAuthenticated) {
@@ -33,18 +36,18 @@ const Wishlist = () => {
 
   return (
     <PageLayout>
-      <div className="w-full ltr px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 pb-16 md:pb-20 lg:pb-24">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 pb-16 md:pb-20 lg:pb-24">
         <div className="w-full max-w-7xl mx-auto py-8 md:py-12 lg:py-16">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8 md:mb-12">
-            <div>
+          <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center justify-between mb-8 md:mb-12`}>
+            <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
               <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-primary mb-2 md:mb-3">
-                قائمة الأمنيات
+                {t("wishlist.title")}
               </h1>
               <p className="text-lg md:text-xl lg:text-2xl text-muted">
                 {wishlist.length > 0
-                  ? `${wishlist.length} منتج في قائمة الأمنيات`
-                  : "قائمة الأمنيات فارغة"}
+                  ? `${wishlist.length} ${t("wishlist.productsCount")}`
+                  : t("wishlist.empty")}
               </p>
             </div>
             {wishlist.length > 0 && (
@@ -70,7 +73,7 @@ const Wishlist = () => {
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
-                  مسح الكل
+                  {t("wishlist.clearAll")}
                 </span>
               </button>
             )}
@@ -103,7 +106,7 @@ const Wishlist = () => {
                   isDark ? "text-luxury-brown-light" : "text-luxury-brown-text"
                 }`}
               >
-                قائمة الأمنيات فارغة
+                {t("wishlist.empty")}
               </h2>
               <p
                 className={`text-lg md:text-xl mb-8 ${
@@ -112,7 +115,7 @@ const Wishlist = () => {
                     : "text-luxury-brown-text/70"
                 }`}
               >
-                ابدأ بإضافة المنتجات التي تحبها إلى قائمة الأمنيات
+                {t("wishlist.emptyAction")}
               </p>
               <Link
                 to="/products"
@@ -122,25 +125,25 @@ const Wishlist = () => {
                     : "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold text-luxury-brown-darker shadow-luxury-gold/30"
                 }`}
               >
-                تصفح المنتجات
+                {t("wishlist.browseProducts")}
               </Link>
             </div>
           ) : (
             <>
               {/* Products Grid */}
-              <div className="grid rtl grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-6 md:gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-6 md:gap-8">
                 {wishlist.map((product) => (
                   <div key={product.id} className="relative">
                     <ProductCard product={product} />
                     {/* Remove Button */}
                     <button
                       onClick={() => removeFromWishlist(product.id)}
-                      className={`absolute top-3 right-3 z-30 p-2.5 sm:p-3 rounded-full backdrop-blur-md transition-all duration-300 shadow-lg hover:scale-110 transform focus:outline-none focus:ring-4 focus:ring-red-500/60 ${
+                      className={`absolute ${i18n.language === "ar" ? "top-3 left-3" : "top-3 right-3"} z-30 p-2.5 sm:p-3 rounded-full backdrop-blur-md transition-all duration-300 shadow-lg hover:scale-110 transform focus:outline-none focus:ring-4 focus:ring-red-500/60 ${
                         isDark
                           ? "bg-red-500/90 text-white hover:bg-red-600/90"
                           : "bg-red-500/90 text-white hover:bg-red-600/90"
                       }`}
-                      aria-label="Remove from wishlist"
+                      aria-label={t("wishlist.remove")}
                     >
                       <svg
                         className="w-5 h-5 sm:w-6 sm:h-6"
@@ -161,7 +164,7 @@ const Wishlist = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="mt-12 md:mt-16 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
+              <div className={`mt-12 md:mt-16 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center`}>
                 <Link
                   to="/products"
                   className={`w-full sm:w-auto px-8 md:px-10 py-4 md:py-5 rounded-xl font-semibold text-lg md:text-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform focus:outline-none focus:ring-4 focus:ring-luxury-gold/60 text-center ${
@@ -170,7 +173,7 @@ const Wishlist = () => {
                       : "bg-luxury-cream/80 text-luxury-brown-text hover:bg-luxury-cream-dark hover:text-luxury-gold border-2 border-luxury-gold-light/50"
                   }`}
                 >
-                  متابعة التسوق
+                  {t("wishlist.continueShopping")}
                 </Link>
                 <button
                   onClick={() => {
@@ -185,7 +188,7 @@ const Wishlist = () => {
                       : "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold text-luxury-brown-darker shadow-luxury-gold/30"
                   }`}
                 >
-                  إضافة الكل إلى السلة
+                  {t("wishlist.addAllToCart")}
                 </button>
               </div>
             </>

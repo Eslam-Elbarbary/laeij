@@ -4,25 +4,28 @@ import PageLayout from "../components/PageLayout";
 import { useTheme } from "../contexts/ThemeContext";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 const Addresses = () => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const { showToast } = useToast();
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const hasShownToast = useRef(false);
   const [addresses, setAddresses] = useState([
     {
       id: 1,
-      type: "المنزل",
-      location: "أبو ظبي – حي النرجس",
-      details: "طريق الكورنيش الشمالي، بجانب رد سي مول",
+      type: t("addresses.demoAddress1.type"),
+      location: t("addresses.demoAddress1.location"),
+      details: t("addresses.demoAddress1.details"),
     },
     {
       id: 2,
-      type: "العمل",
-      location: "عجمان - حي الشاطئ",
-      details: "طريق الملك فهد، بجوار جامعة الإمام عبد الرحمن بن فيصل",
+      type: t("addresses.demoAddress2.type"),
+      location: t("addresses.demoAddress2.location"),
+      details: t("addresses.demoAddress2.details"),
     },
   ]);
   const [editingId, setEditingId] = useState(null);
@@ -36,10 +39,32 @@ const Addresses = () => {
   useEffect(() => {
     if (!isAuthenticated && !hasShownToast.current) {
       hasShownToast.current = true;
-      showToast("يرجى تسجيل الدخول لعرض العناوين", "error");
+      showToast(t("addresses.pleaseLogin"), "error");
       navigate("/login");
     }
-  }, [isAuthenticated, navigate, showToast]);
+  }, [isAuthenticated, navigate, showToast, t]);
+
+  // Update demo addresses when language changes (preserve other addresses)
+  useEffect(() => {
+    setAddresses((prevAddresses) => {
+      const otherAddresses = prevAddresses.filter((addr) => addr.id !== 1 && addr.id !== 2);
+      return [
+        {
+          id: 1,
+          type: t("addresses.demoAddress1.type"),
+          location: t("addresses.demoAddress1.location"),
+          details: t("addresses.demoAddress1.details"),
+        },
+        {
+          id: 2,
+          type: t("addresses.demoAddress2.type"),
+          location: t("addresses.demoAddress2.location"),
+          details: t("addresses.demoAddress2.details"),
+        },
+        ...otherAddresses,
+      ];
+    });
+  }, [i18n.language, t]);
 
   // Don't render if not authenticated
   if (!isAuthenticated) {
@@ -47,9 +72,9 @@ const Addresses = () => {
   }
 
   const handleDelete = (id) => {
-    if (window.confirm("هل أنت متأكد من حذف هذا العنوان؟")) {
+    if (window.confirm(t("addresses.deleteConfirm"))) {
       setAddresses(addresses.filter((addr) => addr.id !== id));
-      showToast("تم حذف العنوان بنجاح", "success");
+      showToast(t("addresses.addressDeleted"), "success");
     }
   };
 
@@ -70,7 +95,7 @@ const Addresses = () => {
     );
     setEditingId(null);
     setEditForm({ type: "", location: "", details: "" });
-    showToast("تم تحديث العنوان بنجاح", "success");
+    showToast(t("addresses.addressUpdated"), "success");
   };
 
   const handleCancelEdit = () => {
@@ -92,12 +117,12 @@ const Addresses = () => {
 
   return (
     <PageLayout>
-      <div className="max-w-4xl ltr mx-auto space-y-6 px-4 sm:px-6 md:px-0">
-        <div>
+      <div className={`max-w-4xl mx-auto space-y-6 px-4 sm:px-6 md:px-0`}>
+        <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
           <h1 className="text-2xl mt-[100px] md:text-3xl font-bold text-primary mb-2">
-            العناوين المحفوظة
+            {t("addresses.title")}
           </h1>
-          <p className="text-muted">إدارة عناوين التوصيل الخاصة بك</p>
+          <p className="text-muted">{t("addresses.subtitle")}</p>
         </div>
 
         <div className="space-y-4">
@@ -107,15 +132,16 @@ const Addresses = () => {
               className={`${panelClasses} rounded-2xl p-4 md:p-6 transition-shadow shadow-md hover:shadow-xl`}
             >
               {editingId === address.id ? (
-                <div className="space-y-4">
+                <div className={`space-y-4 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                   <input
                     type="text"
                     value={editForm.type}
                     onChange={(e) =>
                       setEditForm({ ...editForm, type: e.target.value })
                     }
-                    className={`w-full px-4 py-2 rounded-lg ${inputClasses}`}
-                    placeholder="نوع العنوان"
+                    className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                    placeholder={t("addresses.addressType")}
+                    dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   />
                   <input
                     type="text"
@@ -123,37 +149,39 @@ const Addresses = () => {
                     onChange={(e) =>
                       setEditForm({ ...editForm, location: e.target.value })
                     }
-                    className={`w-full px-4 py-2 rounded-lg ${inputClasses}`}
-                    placeholder="الموقع"
+                    className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                    placeholder={t("addresses.location")}
+                    dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   />
                   <textarea
                     value={editForm.details}
                     onChange={(e) =>
                       setEditForm({ ...editForm, details: e.target.value })
                     }
-                    className={`w-full px-4 py-2 rounded-lg ${inputClasses}`}
-                    placeholder="التفاصيل"
+                    className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                    placeholder={t("addresses.details")}
                     rows={3}
+                    dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   />
-                  <div className="flex gap-2">
+                  <div className={`flex gap-2 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                     <button
                       onClick={handleSaveEdit}
                       className="flex-1 bg-luxury-gold hover:bg-luxury-gold-light text-luxury-brown-darker py-2 rounded-lg font-semibold transition-colors"
                     >
-                      حفظ
+                      {t("addresses.save")}
                     </button>
                     <button
                       onClick={handleCancelEdit}
                       className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg font-semibold transition-colors"
                     >
-                      إلغاء
+                      {t("addresses.cancel")}
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                <div className={`flex items-start justify-between mb-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+                  <div className={`flex-1 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                    <div className={`flex items-center gap-2 mb-2 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                       <span className="text-amber-500">📍</span>
                       <h3 className="text-primary font-semibold">
                         {address.type}
@@ -162,9 +190,10 @@ const Addresses = () => {
                     <p className="text-secondary mb-1">{address.location}</p>
                     <p className="text-muted text-sm">{address.details}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className={`flex gap-2 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                     <button
                       onClick={() => handleEdit(address)}
+                      aria-label={t("addresses.edit")}
                       className="text-amber-500 hover:text-amber-400 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                     >
                       <svg
@@ -183,6 +212,7 @@ const Addresses = () => {
                     </button>
                     <button
                       onClick={() => handleDelete(address.id)}
+                      aria-label={t("addresses.delete")}
                       className="text-red-500 hover:text-red-600 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/40"
                     >
                       <svg
@@ -210,19 +240,19 @@ const Addresses = () => {
           onClick={() => {
             const newAddress = {
               id: Date.now(),
-              type: "عنوان جديد",
-              location: "أدخل الموقع",
-              details: "أدخل التفاصيل",
+              type: t("addresses.newAddress"),
+              location: t("addresses.enterLocation"),
+              details: t("addresses.enterDetails"),
             };
             setAddresses([...addresses, newAddress]);
             setEditingId(newAddress.id);
             setEditForm({ type: "", location: "", details: "" });
-            showToast("تم إضافة عنوان جديد", "success");
+            showToast(t("addresses.addressAdded"), "success");
           }}
-          className={`w-full mb-[100px] ${buttonClasses} py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-4 focus:ring-luxury-gold/40`}
+          className={`w-full mb-[100px] ${buttonClasses} py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-4 focus:ring-luxury-gold/40 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}
         >
           <span>+</span>
-          <span>اضف عنوان جديد</span>
+          <span>{t("addresses.addNewAddress")}</span>
         </button>
       </div>
     </PageLayout>

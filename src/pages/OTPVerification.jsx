@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 import logo from "../assets/logo.png";
 
 const OTPVerification = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDark } = useTheme();
+  const { t } = useTranslation();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
   const handleOtpChange = (index, value) => {
@@ -48,11 +51,11 @@ const OTPVerification = () => {
         {/* Logo */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
-            <div className="relative flex items-center justify-center transition-transform hover:scale-105 duration-300">
+            <div className="relative flex items-center justify-center">
               <img
                 src={logo}
                 alt="لاعج - Laeij"
-                className="h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 object-contain transition-all duration-300 hover:brightness-110 hover:drop-shadow-2xl filter drop-shadow-xl"
+                className="h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 object-contain filter drop-shadow-xl"
                 loading="eager"
                 onError={(e) => {
                   e.target.style.display = "none";
@@ -67,10 +70,10 @@ const OTPVerification = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className={`${panelClasses} rounded-2xl p-8 md:p-10 space-y-6 shadow-2xl backdrop-blur`}>
-          <p className="text-secondary text-center text-lg mb-2">
-            أرسلنا رمز مكون من 6 أرقام إلى رقمك
+          <p className={`text-secondary text-center text-lg mb-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+            {t("otpVerification.title")}
           </p>
-          <p className="text-muted text-center text-sm mb-8">
+          <p className={`text-muted text-center text-sm mb-8 ltr ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
             {location.state?.phoneNumber || "+971 56 123 4567"}
           </p>
 
@@ -98,13 +101,13 @@ const OTPVerification = () => {
             type="submit"
             className="w-full bg-gradient-to-r from-luxury-gold to-luxury-gold-dark text-luxury-brown-darker py-4 rounded-xl font-semibold text-lg hover:from-luxury-gold-light hover:to-luxury-gold transition-all shadow-lg focus:outline-none focus:ring-4 focus:ring-luxury-gold/50"
           >
-            تأكيد الرقم
+            {t("otpVerification.confirm")}
           </button>
         </form>
 
-        <p className="text-muted text-sm text-center mt-6">
+        <p className={`text-muted text-sm text-center mt-6 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
           <button className="text-luxury-gold hover:text-luxury-gold-light">
-            لم يصل اليك الكود؟ إعادة الأرسال
+            {t("otpVerification.resend")}
           </button>
         </p>
       </div>

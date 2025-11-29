@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { mockProducts } from "../services/mockData";
 
 const CartContext = createContext();
 
@@ -15,7 +16,21 @@ export const CartProvider = ({ children }) => {
     const saved = localStorage.getItem("cart");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const items = JSON.parse(saved);
+        // Enrich cart items with translation data if missing
+        return items.map((item) => {
+          if (!item.nameEn && item.id) {
+            const product = mockProducts.find((p) => p.id === parseInt(item.id));
+            if (product) {
+              return {
+                ...item,
+                nameEn: product.nameEn || item.name,
+                categoryId: product.categoryId || item.categoryId,
+              };
+            }
+          }
+          return item;
+        });
       } catch (e) {
         return [];
       }
@@ -42,7 +57,9 @@ export const CartProvider = ({ children }) => {
         {
           id: product.id,
           name: product.name,
+          nameEn: product.nameEn || product.name,
           category: product.category,
+          categoryId: product.categoryId,
           price:
             typeof product.price === "string"
               ? parseFloat(product.price.replace(/[^\d.]/g, ""))

@@ -5,8 +5,15 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useCart } from "../contexts/CartContext";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
+import {
+  getTranslatedName,
+  getTranslatedCategory,
+} from "../utils/translations";
 
 const Cart = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
@@ -34,8 +41,8 @@ const Cart = () => {
 
   const handleApplyDiscount = () => {
     if (!discountCode.trim()) {
-      setDiscountError("يرجى إدخال كود الخصم");
-      showToast("يرجى إدخال كود الخصم", "error");
+      setDiscountError(t("cart.discountRequired"));
+      showToast(t("cart.discountRequired"), "error");
       return;
     }
     // Simulate discount code validation
@@ -43,11 +50,11 @@ const Cart = () => {
     if (validCodes.includes(discountCode.toUpperCase())) {
       setDiscountApplied(true);
       setDiscountError("");
-      showToast("تم تطبيق كود الخصم بنجاح!", "success");
+      showToast(t("cart.discountApplied"), "success");
     } else {
-      setDiscountError("كود الخصم غير صحيح");
+      setDiscountError(t("cart.discountError"));
       setDiscountApplied(false);
-      showToast("كود الخصم غير صحيح", "error");
+      showToast(t("cart.discountError"), "error");
     }
   };
 
@@ -55,12 +62,12 @@ const Cart = () => {
     setDiscountApplied(false);
     setDiscountCode("");
     setDiscountError("");
-    showToast("تم إزالة كود الخصم", "info");
+    showToast(t("cart.removeDiscount"), "info");
   };
 
   const handleRemoveItem = (itemId, itemName) => {
     removeFromCart(itemId);
-    showToast(`تم إزالة ${itemName} من السلة`, "success");
+    showToast(t("cart.removedFromCart", { name: itemName }), "success");
   };
 
   return (
@@ -69,12 +76,12 @@ const Cart = () => {
         <div className="py-8 md:py-12 lg:py-16 space-y-8 md:space-y-12">
           <div className="text-primary">
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-5">
-              سلة التسوق
+              {t("cart.title")}
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl text-muted">
               {cartItems.length === 0
-                ? "السلة فارغة"
-                : `${cartItems.length} منتج في السلة`}
+                ? t("cart.empty")
+                : t("cart.itemsCount", { count: cartItems.length })}
             </p>
           </div>
 
@@ -104,7 +111,7 @@ const Cart = () => {
                   isDark ? "text-luxury-brown-light" : "text-luxury-brown-text"
                 }`}
               >
-                سلة التسوق فارغة
+                {t("cart.empty")}
               </h2>
               <p
                 className={`text-lg md:text-xl mb-8 ${
@@ -113,7 +120,7 @@ const Cart = () => {
                     : "text-luxury-brown-text/70"
                 }`}
               >
-                ابدأ بإضافة المنتجات إلى سلة التسوق
+                {t("cart.emptyDesc")}
               </p>
               <Link
                 to="/products"
@@ -123,7 +130,7 @@ const Cart = () => {
                     : "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold text-luxury-brown-darker shadow-luxury-gold/30"
                 }`}
               >
-                تصفح المنتجات
+                {t("cart.continueShopping")}
               </Link>
             </div>
           )}
@@ -139,21 +146,22 @@ const Cart = () => {
                       isDark
                         ? "hover:bg-luxury-brown-darker/70 hover:border-luxury-gold/60"
                         : "hover:bg-luxury-cream hover:border-luxury-gold/50"
-                    }`}
+                    } ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}
                   >
+                    {/* Product Image */}
                     <div
                       className={`relative w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden flex-shrink-0 border ${
                         isDark
                           ? "bg-black border-luxury-gold-dark/40"
                           : "bg-luxury-cream border-luxury-gold-light/50"
-                      }`}
+                      } ${i18n.language === "ar" ? "order-3" : "order-1"}`}
                     >
                       <img
                         src={
                           item.image ||
                           "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop&q=80&auto=format"
                         }
-                        alt={item.name}
+                        alt={getTranslatedName(item)}
                         className="absolute inset-0 w-full h-full object-cover object-center"
                         onError={(e) => {
                           e.target.src =
@@ -162,8 +170,10 @@ const Cart = () => {
                       />
                     </div>
 
-                    <div className="flex-1 text-right">
-                      <div className="flex items-center justify-end gap-4 mb-4 md:mb-6">
+                    {/* Product Details */}
+                    <div className={`flex-1 ${i18n.language === "ar" ? "text-right order-2" : "text-left order-2"}`}>
+                      {/* Quantity Controls */}
+                      <div className={`flex items-center gap-2 mb-4 md:mb-6 ${i18n.language === "ar" ? "justify-end flex-row-reverse" : "justify-start"}`}>
                         <button
                           onClick={() => handleUpdateQuantity(item.id, -1)}
                           className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center font-bold text-lg focus:outline-none focus:ring-4 focus:ring-luxury-gold/40 transition-colors ${
@@ -189,25 +199,32 @@ const Cart = () => {
                         </button>
                       </div>
 
+                      {/* Product Title */}
                       <h3 className="text-primary font-bold text-lg md:text-xl lg:text-2xl mb-3">
-                        {item.name}
+                        {getTranslatedName(item)}
                       </h3>
+                      
+                      {/* Product Category */}
                       <p className="text-muted text-sm md:text-base mb-4 md:mb-5">
-                        {item.category}
+                        {getTranslatedCategory(item.category, item.categoryId)}
                       </p>
+                      
+                      {/* Price */}
                       <p className="text-amber-500 font-bold text-xl md:text-2xl lg:text-3xl mb-5">
-                        {item.price * item.quantity} درهم
+                        {item.price * item.quantity} {t("productCard.currency")}
                       </p>
 
-                      <button className="text-amber-500 text-base md:text-lg flex items-center gap-2 hover:text-amber-400 transition-colors focus:outline-none focus:ring-4 focus:ring-amber-700/50 rounded-lg px-3 py-2">
+                      {/* Add Note Button */}
+                      <button className={`text-amber-500 text-base md:text-lg flex items-center gap-2 hover:text-amber-400 transition-colors focus:outline-none focus:ring-4 focus:ring-amber-700/50 rounded-lg px-3 py-2 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                         <span>+</span>
-                        <span>أضف ملاحظة</span>
+                        <span>{t("cart.addNote")}</span>
                       </button>
                     </div>
 
+                    {/* Delete Button */}
                     <button
                       onClick={() => handleRemoveItem(item.id, item.name)}
-                      className="text-red-500 hover:text-red-600 transition-colors p-2 hover:bg-red-500/10 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-500/50 flex items-center justify-center flex-shrink-0"
+                      className={`text-red-500 hover:text-red-600 transition-colors p-2 hover:bg-red-500/10 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-500/50 flex items-center justify-center flex-shrink-0 ${i18n.language === "ar" ? "order-1" : "order-3"}`}
                       aria-label="Remove item"
                     >
                       <svg
@@ -236,9 +253,12 @@ const Cart = () => {
                 >
                   <div className="flex items-center justify-between mb-4 md:mb-6">
                     <h3 className="text-primary font-semibold text-lg md:text-xl">
-                      عنوان التوصيل
+                      {t("cart.deliveryAddress")}
                     </h3>
-                    <button className="text-amber-500 hover:text-amber-400 transition-colors p-2 hover:bg-amber-500/10 rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-700/50 flex items-center justify-center">
+                    <button
+                      className="text-amber-500 hover:text-amber-400 transition-colors p-2 hover:bg-amber-500/10 rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-700/50 flex items-center justify-center"
+                      aria-label={t("cart.changeAddress")}
+                    >
                       <svg
                         className="w-5 h-5"
                         fill="none"
@@ -257,10 +277,10 @@ const Cart = () => {
                   <div className="flex items-center gap-3 text-secondary">
                     <div className="text-right flex-1">
                       <p className="text-primary font-medium md:text-lg">
-                        المنزل
+                        {t("cart.home")}
                       </p>
                       <p className="text-sm md:text-base text-secondary">
-                        أبو ظبي – حي النرجس
+                        {t("footer.addressValue")}
                       </p>
                     </div>
                     <svg
@@ -310,7 +330,7 @@ const Cart = () => {
                       </svg>
                     </div>
                     <h3 className="text-primary font-semibold text-base md:text-lg">
-                      كود الخصم
+                      {t("cart.discountCode")}
                     </h3>
                   </div>
                   {discountApplied ? (
@@ -339,10 +359,12 @@ const Cart = () => {
                         </div>
                         <div className="flex-1">
                           <p className="text-green-400 font-semibold text-sm md:text-base mb-1">
-                            تم تطبيق الخصم بنجاح!
+                            {t("cart.discountApplied")}
                           </p>
                           <p className="text-muted text-xs md:text-sm">
-                            خصم {discountAmount} درهم
+                            {t("cart.discountAmount", {
+                              amount: discountAmount,
+                            })}
                           </p>
                         </div>
                       </div>
@@ -381,7 +403,7 @@ const Cart = () => {
                                 handleApplyDiscount();
                               }
                             }}
-                            placeholder="إختر كود خصم"
+                            placeholder={t("cart.enterDiscountCode")}
                             className={`w-full rounded-xl px-4 md:px-6 py-3 md:py-4 pl-12 pr-4 md:pr-6 focus:outline-none focus:ring-4 transition-all duration-300 shadow-inner ${
                               discountError
                                 ? "border border-red-500 focus:border-red-500 focus:ring-red-400/40"
@@ -410,7 +432,7 @@ const Cart = () => {
                           onClick={handleApplyDiscount}
                           className="bg-gradient-to-r from-amber-600 to-amber-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl hover:from-amber-700 hover:to-amber-800 whitespace-nowrap font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-amber-900/50 hover:scale-105 transform focus:outline-none focus:ring-4 focus:ring-amber-700/50 flex items-center justify-center gap-2.5 md:gap-3"
                         >
-                          <span>تطبيق</span>
+                          <span>{t("cart.apply")}</span>
                           <svg
                             className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0"
                             fill="none"
@@ -459,7 +481,7 @@ const Cart = () => {
                           />
                         </svg>
                         <span className="leading-relaxed">
-                          أدخل كود الخصم الخاص بك للحصول على خصم إضافي
+                          {t("cart.discountHint")}
                         </span>
                       </p>
                     </>
@@ -476,11 +498,11 @@ const Cart = () => {
                       className="w-5 h-5 md:w-6 md:h-6 accent-amber-600 cursor-pointer focus:outline-none focus:ring-4 focus:ring-amber-700/50 rounded"
                     />
                     <span className="text-primary font-medium md:text-lg">
-                      توصيل اليوم
+                      {t("cart.sameDayDelivery")}
                     </span>
                   </div>
                   <span className="text-amber-500 font-semibold md:text-lg">
-                    + 60 درهم
+                    + 60 {t("productCard.currency")}
                   </span>
                 </div>
 
@@ -489,15 +511,19 @@ const Cart = () => {
                   className={`${primaryPanelClasses} backdrop-blur-sm rounded-2xl p-6 md:p-8 space-y-4 md:space-y-5 shadow-lg`}
                 >
                   <h3 className="text-primary font-semibold text-lg md:text-xl mb-6">
-                    ملخص الطلب
+                    {t("cart.orderSummary")}
                   </h3>
                   <div className="flex justify-between text-secondary text-base md:text-lg">
-                    <span>المجموع الجزئي</span>
-                    <span>{subtotal} درهم</span>
+                    <span>{t("cart.subtotal")}</span>
+                    <span>
+                      {subtotal} {t("productCard.currency")}
+                    </span>
                   </div>
                   <div className="flex justify-between text-secondary text-base md:text-lg">
-                    <span>التوصيل</span>
-                    <span>{delivery} درهم</span>
+                    <span>{t("cart.shipping")}</span>
+                    <span>
+                      {delivery} {t("productCard.currency")}
+                    </span>
                   </div>
                   {discountApplied && (
                     <div className="flex justify-between text-green-400 text-base md:text-lg font-semibold">
@@ -515,14 +541,18 @@ const Cart = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        الخصم
+                        {t("cart.discount")}
                       </span>
-                      <span>-{discountAmount} درهم</span>
+                      <span>
+                        -{discountAmount} {t("productCard.currency")}
+                      </span>
                     </div>
                   )}
                   <div className="border-t border-card pt-4 md:pt-5 flex justify-between text-primary font-bold text-xl md:text-2xl">
-                    <span>الإجمالي</span>
-                    <span className="text-amber-500">{total} درهم</span>
+                    <span>{t("cart.total")}</span>
+                    <span className="text-amber-500">
+                      {total} {t("productCard.currency")}
+                    </span>
                   </div>
                 </div>
 
@@ -530,10 +560,7 @@ const Cart = () => {
                 <button
                   onClick={() => {
                     if (!isAuthenticated) {
-                      showToast(
-                        "يرجى تسجيل الدخول للمتابعة إلى الدفع",
-                        "error"
-                      );
+                      showToast(t("cart.loginRequiredCheckout"), "error");
                       navigate("/login");
                     } else {
                       navigate("/checkout");
@@ -541,14 +568,14 @@ const Cart = () => {
                   }}
                   className="w-full bg-gradient-to-r from-amber-600 to-amber-800 text-white py-4 md:py-5 rounded-xl font-semibold text-lg md:text-xl hover:from-amber-700 hover:to-amber-900 transition-all shadow-2xl hover:shadow-amber-900/50 hover:scale-[1.02] transform duration-300 focus:outline-none focus:ring-4 focus:ring-amber-700/50"
                 >
-                  اذهب للدفع
+                  {t("cart.checkout")}
                 </button>
 
                 <Link
                   to="/products"
                   className="block w-full text-center text-amber-500 py-3 md:py-4 hover:text-amber-400 transition-colors font-medium focus:outline-none focus:ring-4 focus:ring-amber-700/50 rounded-xl"
                 >
-                  الإستمرار في التسوق
+                  {t("cart.continueShoppingLink")}
                 </Link>
               </div>
             </div>

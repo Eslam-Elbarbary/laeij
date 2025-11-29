@@ -5,8 +5,11 @@ import ProductCard from "../components/ProductCard";
 import PageLayout from "../components/PageLayout";
 import { ProductsGridSkeleton } from "../components/LoadingSkeleton";
 import apiService from "../services/api";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 const Products = () => {
+  const { t } = useTranslation();
   const { isDark } = useTheme();
   const [searchParams] = useSearchParams();
   const categoryId = searchParams.get("category") || null;
@@ -37,39 +40,52 @@ const Products = () => {
   const [inStockOnly, setInStockOnly] = useState(false);
 
   const filters = [
-    { value: "all", label: "الكل" },
-    { value: "بخاخات السيارات", label: "بخاخات السيارات" },
-    { value: "عطور حصرية", label: "عطور حصرية" },
-    { value: "تركيبات مميزة", label: "تركيبات مميزة" },
-    { value: "بخاخات تجميل", label: "بخاخات تجميل" },
-    { value: "أخرى", label: "أخرى" },
-    { value: "عطور كلاسيكية", label: "عطور كلاسيكية" },
+    { value: "all", label: t("products.all") },
+    { value: "بخاخات السيارات", label: t("products.filters.carSprays") },
+    { value: "عطور حصرية", label: t("products.filters.exclusivePerfumes") },
+    { value: "تركيبات مميزة", label: t("products.filters.specialBlends") },
+    { value: "بخاخات تجميل", label: t("products.filters.cosmeticSprays") },
+    { value: "أخرى", label: t("products.filters.other") },
+    { value: "عطور كلاسيكية", label: t("products.filters.classicPerfumes") },
   ];
 
-  const brands = [
-    "لاعج",
-    "أرماني",
-    "دولتشي آند غابانا",
-    "توم فورد",
-    "كريستيان ديور",
-    "شانيل",
-    "فيرساتشي",
+  const brandKeys = [
+    "laeij",
+    "armani",
+    "dolceGabbana",
+    "tomFord",
+    "christianDior",
+    "chanel",
+    "versace",
   ];
 
-  const sizes = ["12 مل", "25 جم", "30 جم", "50 جم", "75 جم", "100 جم"];
+  // Get translated brand names
+  const brands = brandKeys.map((key) => ({
+    key,
+    name: t(`products.brands.${key}`),
+  }));
+
+  const sizes = [
+    t("products.sizes.12ml"),
+    t("products.sizes.25g"),
+    t("products.sizes.30g"),
+    t("products.sizes.50g"),
+    t("products.sizes.75g"),
+    t("products.sizes.100g"),
+  ];
 
   const sortOptions = [
-    { value: "price-low", label: "السعر: من الأقل للأعلى" },
-    { value: "price-high", label: "السعر: من الأعلى للأقل" },
-    { value: "newest", label: "الأحدث" },
-    { value: "popular", label: "الأكثر شعبية" },
-    { value: "rating", label: "الأعلى تقييماً" },
+    { value: "price-low", label: t("products.priceLowToHigh") },
+    { value: "price-high", label: t("products.priceHighToHigh") },
+    { value: "newest", label: t("products.newest") },
+    { value: "popular", label: t("products.popular") },
+    { value: "rating", label: t("products.rating") },
   ];
 
   // Format price helper
   const formatPrice = (price) => {
     if (typeof price === "number") {
-      return price.toLocaleString("ar-AE");
+      return price.toLocaleString(i18n.language === "ar" ? "ar-AE" : "en-US");
     }
     return price;
   };
@@ -120,7 +136,7 @@ const Products = () => {
           setError(response.message);
         }
       } catch (err) {
-        setError("فشل في تحميل المنتجات");
+        setError(t("products.errorLoading"));
         console.error("Error fetching products:", err);
       } finally {
         setLoading(false);
@@ -162,7 +178,7 @@ const Products = () => {
             <div className="absolute inset-0">
               <img
                 src="https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=1920&h=1080&fit=crop&q=90&auto=format"
-                alt="عطور حصرية"
+                alt={t("products.title")}
                 className="absolute inset-0 w-full h-full object-cover object-center scale-105 transition-transform ease-out"
                 style={{ transitionDuration: "5000ms" }}
                 loading="eager"
@@ -213,11 +229,10 @@ const Products = () => {
           <div className="relative z-10 h-full flex items-center justify-center">
             <div className="text-center text-white max-w-5xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
               <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold mb-6 md:mb-8 lg:mb-10 drop-shadow-2xl animate-fade-in">
-                عطور حصرية
+                {t("products.title")}
               </h1>
               <p className="text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl opacity-95 leading-relaxed drop-shadow-lg max-w-4xl mx-auto animate-fade-in">
-                عطور استثنائية بإصدارات محدودة تمزج الفخامة مع الإبداع، لتمنحك
-                هوية عطرية متفردة لا تتكرر.
+                {t("products.subtitle")}
               </p>
             </div>
           </div>
@@ -225,25 +240,27 @@ const Products = () => {
 
         {/* Filters - Full Width Edge to Edge */}
         <div
-          className={`w-screen relative left-1/2 -translate-x-1/2 backdrop-blur-md py-8 md:py-10 mb-16 md:mb-20 lg:mb-24 border-y transition-all duration-300 ${
+          className={`w-[90%]  relative left-1/2 -translate-x-1/2 py-6 md:py-8 mb-16 md:mb-20 lg:mb-24 border-t border-b ${
             isDark
-              ? "bg-luxury-brown-darker/60 border-luxury-gold-dark/30"
-              : "bg-luxury-gold/12 border-luxury-gold-light/50"
+              ? "bg-luxury-brown-darker/30 border-luxury-brown-text/15"
+              : "bg-luxury-cream/40 border-gray-300/30"
           }`}
         >
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
-            <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex justify-center w-[1259px] gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
               {filters.map((filter) => (
                 <button
                   key={filter.value}
                   onClick={() => setSelectedFilter(filter.value)}
-                  className={`px-7 mt-[10px] ml-[10px] mr-[10px] md:px-9 py-4 md:py-5 rounded-xl whitespace-nowrap transition-all text-sm md:text-base font-semibold shadow-lg hover:scale-110 transform duration-300 focus:outline-none focus:ring-4 focus:ring-luxury-gold/60 relative overflow-hidden group ${
+                  className={`shrink-0 min-w-fit px-6 md:px-8 lg:px-10 py-3 md:py-4 rounded-lg whitespace-nowrap transition-all duration-200 text-sm md:text-base font-medium snap-start ${
                     selectedFilter === filter.value
-                      ? "bg-luxury-gold text-luxury-brown-darker shadow-lg shadow-luxury-gold/50 font-bold"
+                      ? isDark
+                        ? "bg-transparent text-white border-[3px] border-white shadow-md"
+                        : "bg-transparent text-luxury-brown-darker border-[3px] border-luxury-brown-darker shadow-md"
                       : isDark
-                      ? "bg-luxury-brown-darker/90 text-luxury-brown-light hover:bg-luxury-brown-text hover:text-luxury-gold-light"
-                      : "bg-luxury-cream/80 text-luxury-brown-text hover:bg-luxury-cream-dark hover:text-luxury-gold"
-                  }`}
+                      ? "bg-white/5 text-gray-300 border-2 border-transparent hover:bg-white/10 hover:text-white shadow-sm"
+                      : "bg-white/60 text-gray-700 border-2 border-transparent hover:bg-white hover:shadow-sm"
+                  } focus:outline-none focus:ring-2 focus:ring-luxury-gold/50`}
                 >
                   {filter.label}
                 </button>
@@ -265,7 +282,7 @@ const Products = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="البحث في العطور..."
+                  placeholder={t("products.searchPlaceholder")}
                   className={`w-full backdrop-blur-sm rounded-2xl px-7 md:px-9 py-5 md:py-6 pr-16 md:pr-18 text-base md:text-lg border-2 focus:outline-none focus:ring-4 focus:ring-luxury-gold/60 transition-all shadow-xl hover:shadow-2xl ${
                     isDark
                       ? "bg-luxury-brown-darker/95 text-white placeholder-luxury-brown-light border-luxury-gold-dark/40 focus:border-luxury-gold hover:border-luxury-gold-dark/60"
@@ -326,7 +343,7 @@ const Products = () => {
                         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                       />
                     </svg>
-                    التصفية
+                    {t("products.filter")}
                     {(selectedBrands.length > 0 ||
                       selectedSizes.length > 0 ||
                       minRating > 0 ||
@@ -409,7 +426,7 @@ const Products = () => {
                 {/* Sidebar Header */}
                 <div className="flex items-center justify-between mb-6 md:mb-8 pb-4 border-b-2 border-card">
                   <h3 className="text-xl md:text-2xl font-bold text-primary">
-                    التصفية
+                    {t("products.filter")}
                   </h3>
                   <button
                     onClick={() => {
@@ -421,7 +438,7 @@ const Products = () => {
                     }}
                     className="text-sm text-luxury-gold hover:text-luxury-gold-light font-semibold transition-colors"
                   >
-                    مسح الكل
+                    {t("products.clearAll")}
                   </button>
                 </div>
 
@@ -429,7 +446,7 @@ const Products = () => {
                   {/* Price Range */}
                   <div>
                     <label className="block text-base md:text-lg font-semibold text-primary mb-4">
-                      نطاق السعر
+                      {t("products.priceRange")}
                     </label>
                     <div className="space-y-4">
                       <div
@@ -439,8 +456,14 @@ const Products = () => {
                             : "bg-luxury-gold/15 text-luxury-gold border border-luxury-gold/40"
                         }`}
                       >
-                        {priceRange[0].toLocaleString("ar-AE")} -{" "}
-                        {priceRange[1].toLocaleString("ar-AE")} درهم
+                        {priceRange[0].toLocaleString(
+                          i18n.language === "ar" ? "ar-AE" : "en-US"
+                        )}{" "}
+                        -{" "}
+                        {priceRange[1].toLocaleString(
+                          i18n.language === "ar" ? "ar-AE" : "en-US"
+                        )}{" "}
+                        {t("productCard.currency")}
                       </div>
                       <input
                         type="range"
@@ -495,7 +518,7 @@ const Products = () => {
                               ? "bg-luxury-brown-darker/80 text-white border-luxury-gold-dark/40"
                               : "bg-white text-luxury-brown-text border-luxury-gold-light/50"
                           }`}
-                          placeholder="من"
+                          placeholder={t("products.from")}
                         />
                         <input
                           type="number"
@@ -513,7 +536,7 @@ const Products = () => {
                               ? "bg-luxury-brown-darker/80 text-white border-luxury-gold-dark/40"
                               : "bg-white text-luxury-brown-text border-luxury-gold-light/50"
                           }`}
-                          placeholder="إلى"
+                          placeholder={t("products.to")}
                         />
                       </div>
                     </div>
@@ -522,30 +545,33 @@ const Products = () => {
                   {/* Brands */}
                   <div>
                     <label className="block text-base md:text-lg font-semibold text-primary mb-4">
-                      الماركة
+                      {t("products.brand")}
                     </label>
                     <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-luxury-gold scrollbar-track-transparent">
                       {brands.map((brand) => (
                         <label
-                          key={brand}
+                          key={brand.key}
                           className="flex items-center gap-3 cursor-pointer group hover:bg-card-muted p-2 rounded-lg transition-colors"
                         >
                           <input
                             type="checkbox"
-                            checked={selectedBrands.includes(brand)}
+                            checked={selectedBrands.includes(brand.name)}
                             onChange={(e) => {
                               if (e.target.checked) {
-                                setSelectedBrands([...selectedBrands, brand]);
+                                setSelectedBrands([
+                                  ...selectedBrands,
+                                  brand.name,
+                                ]);
                               } else {
                                 setSelectedBrands(
-                                  selectedBrands.filter((b) => b !== brand)
+                                  selectedBrands.filter((b) => b !== brand.name)
                                 );
                               }
                             }}
                             className="w-5 h-5 rounded border-2 border-luxury-gold text-luxury-gold focus:ring-luxury-gold focus:ring-offset-0 cursor-pointer"
                           />
                           <span className="text-sm md:text-base text-primary group-hover:text-luxury-gold transition-colors">
-                            {brand}
+                            {brand.name}
                           </span>
                         </label>
                       ))}
@@ -555,7 +581,7 @@ const Products = () => {
                   {/* Sizes */}
                   <div>
                     <label className="block text-base md:text-lg font-semibold text-primary mb-4">
-                      الحجم
+                      {t("products.size")}
                     </label>
                     <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-luxury-gold scrollbar-track-transparent">
                       {sizes.map((size) => (
@@ -588,7 +614,7 @@ const Products = () => {
                   {/* Rating */}
                   <div>
                     <label className="block text-base md:text-lg font-semibold text-primary mb-4">
-                      التقييم الأدنى
+                      {t("products.minRating")}
                     </label>
                     <div className="flex gap-2">
                       {[1, 2, 3, 4, 5].map((rating) => (
@@ -612,7 +638,7 @@ const Products = () => {
                     </div>
                     {minRating > 0 && (
                       <p className="text-sm text-muted mt-2 text-center">
-                        {minRating}+ ⭐ فما فوق
+                        {minRating}+ ⭐ {t("products.minRatingAndAbove")}
                       </p>
                     )}
                   </div>
@@ -627,7 +653,7 @@ const Products = () => {
                         className="w-6 h-6 rounded border-2 border-luxury-gold text-luxury-gold focus:ring-luxury-gold focus:ring-offset-0 cursor-pointer"
                       />
                       <span className="text-base md:text-lg font-semibold text-primary group-hover:text-luxury-gold transition-colors">
-                        المنتجات المتوفرة فقط
+                        {t("products.inStockOnly")}
                       </span>
                     </label>
                   </div>
@@ -654,7 +680,7 @@ const Products = () => {
                   >
                     <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-card">
                       <h3 className="text-xl font-bold text-primary">
-                        التصفية
+                        {t("products.filter")}
                       </h3>
                       <button
                         onClick={() => setIsSidebarOpen(false)}
@@ -680,7 +706,7 @@ const Products = () => {
                       {/* Price Range */}
                       <div>
                         <label className="block text-base font-semibold text-primary mb-4">
-                          نطاق السعر
+                          {t("products.priceRange")}
                         </label>
                         <div className="space-y-4">
                           <div
@@ -690,8 +716,14 @@ const Products = () => {
                                 : "bg-luxury-gold/15 text-luxury-gold border border-luxury-gold/40"
                             }`}
                           >
-                            {priceRange[0].toLocaleString("ar-AE")} -{" "}
-                            {priceRange[1].toLocaleString("ar-AE")} درهم
+                            {priceRange[0].toLocaleString(
+                              i18n.language === "ar" ? "ar-AE" : "en-US"
+                            )}{" "}
+                            -{" "}
+                            {priceRange[1].toLocaleString(
+                              i18n.language === "ar" ? "ar-AE" : "en-US"
+                            )}{" "}
+                            {t("productCard.currency")}
                           </div>
                           <input
                             type="range"
@@ -746,7 +778,7 @@ const Products = () => {
                                   ? "bg-luxury-brown-darker/80 text-white border-luxury-gold-dark/40"
                                   : "bg-white text-luxury-brown-text border-luxury-gold-light/50"
                               }`}
-                              placeholder="من"
+                              placeholder={t("products.from")}
                             />
                             <input
                               type="number"
@@ -764,7 +796,7 @@ const Products = () => {
                                   ? "bg-luxury-brown-darker/80 text-white border-luxury-gold-dark/40"
                                   : "bg-white text-luxury-brown-text border-luxury-gold-light/50"
                               }`}
-                              placeholder="إلى"
+                              placeholder={t("products.to")}
                             />
                           </div>
                         </div>
@@ -772,33 +804,35 @@ const Products = () => {
                       {/* Brands */}
                       <div>
                         <label className="block text-base font-semibold text-primary mb-4">
-                          الماركة
+                          {t("products.brand")}
                         </label>
                         <div className="space-y-3 max-h-48 overflow-y-auto">
                           {brands.map((brand) => (
                             <label
-                              key={brand}
+                              key={brand.key}
                               className="flex items-center gap-3 cursor-pointer group hover:bg-card-muted p-2 rounded-lg transition-colors"
                             >
                               <input
                                 type="checkbox"
-                                checked={selectedBrands.includes(brand)}
+                                checked={selectedBrands.includes(brand.name)}
                                 onChange={(e) => {
                                   if (e.target.checked) {
                                     setSelectedBrands([
                                       ...selectedBrands,
-                                      brand,
+                                      brand.name,
                                     ]);
                                   } else {
                                     setSelectedBrands(
-                                      selectedBrands.filter((b) => b !== brand)
+                                      selectedBrands.filter(
+                                        (b) => b !== brand.name
+                                      )
                                     );
                                   }
                                 }}
                                 className="w-5 h-5 rounded border-2 border-luxury-gold text-luxury-gold focus:ring-luxury-gold focus:ring-offset-0 cursor-pointer"
                               />
                               <span className="text-sm text-primary group-hover:text-luxury-gold transition-colors">
-                                {brand}
+                                {brand.name}
                               </span>
                             </label>
                           ))}
@@ -807,7 +841,7 @@ const Products = () => {
                       {/* Sizes */}
                       <div>
                         <label className="block text-base font-semibold text-primary mb-4">
-                          الحجم
+                          {t("products.size")}
                         </label>
                         <div className="space-y-3 max-h-48 overflow-y-auto">
                           {sizes.map((size) => (
@@ -839,7 +873,7 @@ const Products = () => {
                       {/* Rating */}
                       <div>
                         <label className="block text-base font-semibold text-primary mb-4">
-                          التقييم الأدنى
+                          {t("products.minRating")}
                         </label>
                         <div className="flex gap-2">
                           {[1, 2, 3, 4, 5].map((rating) => (
@@ -872,7 +906,7 @@ const Products = () => {
                             className="w-6 h-6 rounded border-2 border-luxury-gold text-luxury-gold focus:ring-luxury-gold focus:ring-offset-0 cursor-pointer"
                           />
                           <span className="text-base font-semibold text-primary group-hover:text-luxury-gold transition-colors">
-                            المنتجات المتوفرة فقط
+                            {t("products.inStockOnly")}
                           </span>
                         </label>
                       </div>
@@ -887,7 +921,7 @@ const Products = () => {
                         }}
                         className="w-full py-3 rounded-xl font-semibold text-luxury-gold hover:bg-luxury-gold hover:text-luxury-brown-darker transition-all border-2 border-luxury-gold"
                       >
-                        مسح الكل
+                        {t("products.clearAll")}
                       </button>
                     </div>
                   </aside>
@@ -915,7 +949,7 @@ const Products = () => {
                           : "text-luxury-brown-text/70"
                       }`}
                     >
-                      لا توجد منتجات متاحة
+                      {t("products.noProducts")}
                     </p>
                   </div>
                 ) : (
@@ -928,9 +962,11 @@ const Products = () => {
 
                     {/* Pagination */}
                     {pagination.totalPages > 1 && (
-                      <div className="mt-12 md:mt-16 flex items-center justify-center">
+                      <div className="mt-12 md:mt-16 flex items-center justify-between gap-4 md:gap-6 flex-wrap">
                         <nav
-                          className="flex items-center gap-2 md:gap-3"
+                          className={`flex items-center gap-2 md:gap-3 ${
+                            i18n.language === "ar" ? "flex-row-reverse" : ""
+                          } ${i18n.language === "ar" ? "order-2" : "order-1"}`}
                           aria-label="Pagination"
                         >
                           {/* Previous Button */}
@@ -945,7 +981,11 @@ const Products = () => {
                                 : "bg-luxury-cream/80 text-luxury-brown-text hover:bg-luxury-cream-dark hover:text-luxury-gold border-2 border-luxury-gold-light/50"
                             }`}
                           >
-                            <span className="flex items-center gap-2">
+                            <span
+                              className={`flex items-center gap-2 ${
+                                i18n.language === "ar" ? "flex-row-reverse" : ""
+                              }`}
+                            >
                               <svg
                                 className="w-4 h-4 md:w-5 md:h-5"
                                 fill="none"
@@ -956,15 +996,23 @@ const Products = () => {
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth={2}
-                                  d="M15 19l-7-7 7-7"
+                                  d={
+                                    i18n.language === "ar"
+                                      ? "M9 5l7 7-7 7"
+                                      : "M15 19l-7-7 7-7"
+                                  }
                                 />
                               </svg>
-                              السابق
+                              {t("common.previous")}
                             </span>
                           </button>
 
                           {/* Page Numbers */}
-                          <div className="flex items-center gap-1 md:gap-2">
+                          <div
+                            className={`flex items-center gap-1 md:gap-2 ${
+                              i18n.language === "ar" ? "flex-row-reverse" : ""
+                            }`}
+                          >
                             {Array.from(
                               { length: pagination.totalPages },
                               (_, i) => i + 1
@@ -1030,8 +1078,12 @@ const Products = () => {
                                 : "bg-luxury-cream/80 text-luxury-brown-text hover:bg-luxury-cream-dark hover:text-luxury-gold border-2 border-luxury-gold-light/50"
                             }`}
                           >
-                            <span className="flex items-center gap-2">
-                              التالي
+                            <span
+                              className={`flex items-center gap-2 ${
+                                i18n.language === "ar" ? "flex-row-reverse" : ""
+                              }`}
+                            >
+                              {t("common.next")}
                               <svg
                                 className="w-4 h-4 md:w-5 md:h-5"
                                 fill="none"
@@ -1042,7 +1094,11 @@ const Products = () => {
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth={2}
-                                  d="M9 5l7 7-7 7"
+                                  d={
+                                    i18n.language === "ar"
+                                      ? "M15 19l-7-7 7-7"
+                                      : "M9 5l7 7-7 7"
+                                  }
                                 />
                               </svg>
                             </span>
@@ -1051,18 +1107,26 @@ const Products = () => {
 
                         {/* Pagination Info */}
                         <div
-                          className={`mr-4 md:mr-6 text-sm md:text-base ${
+                          className={`text-sm md:text-base ${
                             isDark
                               ? "text-luxury-brown-light"
                               : "text-luxury-brown-text"
+                          } ${
+                            i18n.language === "ar"
+                              ? "text-right order-1"
+                              : "text-left order-2"
                           }`}
                         >
                           <span className="font-semibold">
-                            صفحة {currentPage} من {pagination.totalPages}
+                            {t("products.page")} {currentPage}{" "}
+                            {t("products.of")} {pagination.totalPages}
                           </span>
                           <span className="mx-2">•</span>
                           <span className="text-muted">
-                            {pagination.total} منتج
+                            {pagination.total}{" "}
+                            {pagination.total === 1
+                              ? t("productCard.product")
+                              : t("categoryCard.products")}
                           </span>
                         </div>
                       </div>

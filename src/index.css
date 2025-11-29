@@ -54,8 +54,6 @@
       sans-serif;
     font-size: 1rem;
     line-height: 1.7;
-    direction: rtl;
-    text-align: right;
     overflow-x: hidden;
     width: 100%;
     -webkit-font-smoothing: antialiased;
@@ -63,6 +61,27 @@
     text-rendering: optimizeLegibility;
     font-feature-settings: "kern" 1, "liga" 1;
     transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Direction is controlled by i18n.js via document.documentElement.dir */
+  html[dir="rtl"] {
+    direction: rtl;
+  }
+
+  html[dir="rtl"] body,
+  html[dir="rtl"] .App {
+    direction: rtl;
+    text-align: right;
+  }
+
+  html[dir="ltr"] {
+    direction: ltr;
+  }
+
+  html[dir="ltr"] body,
+  html[dir="ltr"] .App {
+    direction: ltr;
+    text-align: left;
   }
 
   h1,
@@ -307,8 +326,12 @@
   }
 
   /* Enhanced Arabic typography */
-  [dir="rtl"] {
+  html[dir="rtl"] {
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+
+  html[dir="ltr"] {
+    font-feature-settings: "kern" 1, "liga" 1;
   }
 
   /* Scrollbar */
@@ -335,11 +358,14 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+  /* Utility classes for overriding direction when needed */
   .rtl {
-    direction: rtl;
+    direction: rtl !important;
+    text-align: right !important;
   }
   .ltr {
-    direction: ltr;
+    direction: ltr !important;
+    text-align: left !important;
   }
 }
 

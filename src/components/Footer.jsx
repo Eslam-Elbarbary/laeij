@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import logo from "../assets/logo.png";
 
 const Footer = () => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   // Scroll to top function
@@ -14,29 +16,29 @@ const Footer = () => {
 
   const footerLinks = {
     shop: [
-      { label: "المنتجات", path: "/products" },
-      { label: "الأقسام", path: "/categories" },
-      { label: "العروض", path: "/products?offers=true" },
-      { label: "الأكثر رواجًا", path: "/products?popular=true" },
+      { label: t("footer.products"), path: "/products" },
+      { label: t("footer.categories"), path: "/categories" },
+      { label: t("footer.offers"), path: "/products?offers=true" },
+      { label: t("footer.popular"), path: "/products?popular=true" },
     ],
     account: [
-      { label: "حسابي", path: "/account" },
-      { label: "طلباتي", path: "/orders" },
-      { label: "العناوين", path: "/addresses" },
-      { label: "المفضلة", path: "/favorites" },
+      { label: t("footer.myAccount"), path: "/account" },
+      { label: t("footer.myOrders"), path: "/orders" },
+      { label: t("footer.myAddresses"), path: "/addresses" },
+      { label: t("footer.favorites"), path: "/favorites" },
     ],
     support: [
-      { label: "تواصل معنا", path: "/contact" },
-      { label: "الأسئلة الشائعة", path: "/faq" },
-      { label: "سياسة الإرجاع", path: "/return-policy" },
-      { label: "شروط الاستخدام", path: "/terms" },
+      { label: t("footer.contactUs"), path: "/contact" },
+      { label: t("footer.faq"), path: "/faq" },
+      { label: t("footer.returnPolicy"), path: "/return-policy" },
+      { label: t("footer.terms"), path: "/terms" },
     ],
   };
 
   const socialLinks = [
     {
       name: "Facebook",
-      url: "#",
+      url: "https://www.facebook.com/share/1BMicL9wev/?mibextid=wwXIfr",
       icon: (
         <svg
           className="w-full h-full"
@@ -54,7 +56,7 @@ const Footer = () => {
     },
     {
       name: "Instagram",
-      url: "#",
+      url: "https://www.instagram.com/laeij.boutique?igsh=MW5oa2ZwbHB2dmJiag==",
       icon: (
         <svg
           className="w-full h-full"
@@ -72,7 +74,7 @@ const Footer = () => {
     },
     {
       name: "Twitter",
-      url: "#",
+      url: "https://x.com/laeij7?s=11",
       icon: (
         <svg
           className="w-full h-full"
@@ -85,8 +87,8 @@ const Footer = () => {
       ),
     },
     {
-      name: "WhatsApp",
-      url: "#",
+      name: "TikTok",
+      url: "https://www.tiktok.com/@laeij7?_r=1&_t=ZS-91kMXmKJDnQ",
       icon: (
         <svg
           className="w-full h-full"
@@ -94,7 +96,21 @@ const Footer = () => {
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+          <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-1.195.126 6.618 6.618 0 0 0-1.609.525 6.269 6.269 0 0 0-4.593 6.178 6.27 6.27 0 0 0 10.644 4.438 6.373 6.373 0 0 0 1.265-3.762v-7.002a8.107 8.107 0 0 0 4.77 1.609v-3.414a4.794 4.794 0 0 1-3.77-1.809Z" />
+        </svg>
+      ),
+    },
+    {
+      name: "Snapchat",
+      url: "https://snapchat.com/t/vL1GR6rN",
+      icon: (
+        <svg
+          className="w-full h-full"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z" />
         </svg>
       ),
     },
@@ -117,13 +133,13 @@ const Footer = () => {
               <Link
                 to="/"
                 onClick={scrollToTop}
-                className="flex items-center justify-center group transition-transform hover:scale-105 duration-300"
+                className="flex items-center justify-center"
               >
-                <div className="relative flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
+                <div className="relative flex items-center justify-center">
                   <img
                     src={logo}
                     alt="لاعج - Laeij"
-                    className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-32 lg:w-32 xl:h-36 xl:w-36 2xl:h-40 2xl:w-40 object-contain transition-all duration-300 group-hover:brightness-110 group-hover:drop-shadow-2xl filter drop-shadow-xl"
+                    className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-32 lg:w-32 xl:h-36 xl:w-36 2xl:h-40 2xl:w-40 object-contain filter drop-shadow-xl"
                     loading="eager"
                     onError={(e) => {
                       e.target.style.display = "none";
@@ -131,14 +147,10 @@ const Footer = () => {
                     }}
                   />
                   {/* Fallback emoji if image fails */}
-                  <div className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] hidden">
-                    🐴
-                  </div>
                 </div>
               </Link>
               <p className="text-secondary text-sm md:text-base lg:text-lg leading-relaxed max-w-sm font-medium">
-                متجرك المميز للعطور الفاخرة والزيوت الطبيعية والعود الأصيل.
-                اكتشف روائح فريدة تعكس شخصيتك.
+                {t("footer.description")}
               </p>
               {/* Social Media */}
               <div className="flex items-center gap-4 pt-4">
@@ -165,7 +177,7 @@ const Footer = () => {
             <div className="text-right">
               <h3 className="text-primary dark:text-white font-bold text-xl md:text-2xl lg:text-3xl mb-8 md:mb-10 pb-4 border-b-2 border-luxury-gold-dark/40 dark:border-luxury-gold/40 relative">
                 <span className="absolute bottom-0 right-0 w-16 h-0.5 bg-gradient-to-r from-luxury-gold to-transparent"></span>
-                التسوق
+                {t("footer.shop")}
               </h3>
               <ul className="space-y-5 md:space-y-6">
                 {footerLinks.shop.map((link, index) => (
@@ -192,7 +204,7 @@ const Footer = () => {
             <div className="text-right">
               <h3 className="text-primary dark:text-white font-bold text-xl md:text-2xl lg:text-3xl mb-8 md:mb-10 pb-4 border-b-2 border-luxury-gold-dark/40 dark:border-luxury-gold/40 relative">
                 <span className="absolute bottom-0 right-0 w-16 h-0.5 bg-gradient-to-r from-luxury-gold to-transparent"></span>
-                حسابي
+                {t("footer.account")}
               </h3>
               <ul className="space-y-5 md:space-y-6">
                 {footerLinks.account.map((link, index) => (
@@ -219,14 +231,14 @@ const Footer = () => {
             <div className="text-right">
               <h3 className="text-primary dark:text-white font-bold text-xl md:text-2xl lg:text-3xl mb-8 md:mb-10 pb-4 border-b-2 border-luxury-gold-dark/40 dark:border-luxury-gold/40 relative">
                 <span className="absolute bottom-0 right-0 w-16 h-0.5 bg-gradient-to-r from-luxury-gold to-transparent"></span>
-                الدعم والمساعدة
+                {t("footer.support")}
               </h3>
               {/* Contact Info */}
               <div className="space-y-6 md:space-y-8">
                 <div className="flex ltr  items-start gap-5 group justify-end">
                   <div className="flex-1  text-right order-2">
                     <p className="text-muted text-xs md:text-sm mb-2 font-medium">
-                      الهاتف
+                      {t("footer.phone")}
                     </p>
                     <a
                       href="tel:+971501234567"
@@ -256,7 +268,7 @@ const Footer = () => {
                 <div className="flex ltr items-start gap-5 group justify-end">
                   <div className="flex-1 text-right order-2">
                     <p className="text-muted text-xs md:text-sm mb-2 font-medium">
-                      البريد الإلكتروني
+                      {t("footer.email")}
                     </p>
                     <a
                       href="mailto:info@laeij.com"
@@ -286,32 +298,26 @@ const Footer = () => {
                 <div className="flex ltr items-start gap-5 group justify-end">
                   <div className="flex-1 text-right order-2">
                     <p className="text-muted text-xs md:text-sm mb-2 font-medium">
-                      العنوان
+                      {t("footer.whatsapp")}
                     </p>
-                    <p className="text-luxury-gold text-base md:text-lg lg:text-xl font-bold">
-                      أبو ظبي، الإمارات العربية المتحدة
-                    </p>
+                    <a
+                      href="https://wa.me/971501234567"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={scrollToTop}
+                      className="text-luxury-gold hover:text-luxury-gold-light text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 block"
+                    >
+                      +971 50 123 4567
+                    </a>
                   </div>
                   <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-luxury-gold-dark/20 to-luxury-gold/20 group-hover:from-luxury-gold group-hover:to-luxury-gold-light rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 border border-luxury-gold-dark/30 group-hover:border-luxury-gold group-hover:shadow-lg group-hover:shadow-luxury-gold/40 order-1">
                     <svg
                       className="w-7 h-7 md:w-8 md:h-8 text-luxury-gold group-hover:text-white transition-colors duration-300"
-                      fill="none"
-                      stroke="currentColor"
+                      fill="currentColor"
                       viewBox="0 0 24 24"
                       aria-hidden="true"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                     </svg>
                   </div>
                 </div>
@@ -355,10 +361,10 @@ const Footer = () => {
             <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-10">
               <div className="text-center md:text-right">
                 <p className="text-muted text-xs md:text-sm lg:text-base mb-3 font-medium">
-                  © {currentYear} لاعج (Laeij). جميع الحقوق محفوظة.
+                  © {currentYear} لاعج (Laeij). {t("footer.rights")}
                 </p>
                 <p className="text-muted text-xs md:text-sm">
-                  مصمم ومطور بعناية لراحتك
+                  {t("footer.designed")}
                 </p>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
@@ -367,7 +373,9 @@ const Footer = () => {
                   onClick={scrollToTop}
                   className="text-secondary hover:text-luxury-gold text-xs md:text-sm lg:text-base font-medium transition-all duration-300 hover:underline relative group"
                 >
-                  <span className="relative z-10">سياسة الخصوصية</span>
+                  <span className="relative z-10">
+                    {t("footer.privacyPolicy")}
+                  </span>
                   <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-luxury-gold group-hover:w-full transition-all duration-300"></span>
                 </Link>
                 <span className="text-luxury-gold-dark/50 dark:text-luxury-gold/50 hidden sm:inline text-base">
@@ -378,7 +386,9 @@ const Footer = () => {
                   onClick={scrollToTop}
                   className="text-secondary hover:text-luxury-gold text-xs md:text-sm lg:text-base font-medium transition-all duration-300 hover:underline relative group"
                 >
-                  <span className="relative z-10">شروط الاستخدام</span>
+                  <span className="relative z-10">
+                    {t("footer.termsOfUse")}
+                  </span>
                   <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-luxury-gold group-hover:w-full transition-all duration-300"></span>
                 </Link>
                 <span className="text-luxury-gold-dark/50 dark:text-luxury-gold/50 hidden sm:inline text-base">
@@ -389,7 +399,9 @@ const Footer = () => {
                   onClick={scrollToTop}
                   className="text-secondary hover:text-luxury-gold text-xs md:text-sm lg:text-base font-medium transition-all duration-300 hover:underline relative group"
                 >
-                  <span className="relative z-10">سياسة الشحن</span>
+                  <span className="relative z-10">
+                    {t("footer.shippingPolicy")}
+                  </span>
                   <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-luxury-gold group-hover:w-full transition-all duration-300"></span>
                 </Link>
               </div>

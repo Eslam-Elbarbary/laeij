@@ -1,6 +1,16 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import {
+  getTranslatedName,
+  getTranslatedDescription,
+} from "../utils/translations";
 
 const CategoryCard = ({ category }) => {
+  const { t } = useTranslation();
+
+  // Get translated category data (computed on each render to reflect language changes)
+  const categoryName = getTranslatedName(category);
+  const categoryDescription = getTranslatedDescription(category);
   return (
     <Link
       to={`/products?category=${category.id}`}
@@ -41,14 +51,17 @@ const CategoryCard = ({ category }) => {
 
       <div className="p-7 sm:p-8 md:p-9 space-y-5 bg-card-muted backdrop-blur-sm">
         <h3 className="font-bold text-xl sm:text-2xl md:text-2xl text-primary group-hover:text-luxury-gold-light transition-colors duration-300">
-          {category.name}
+          {categoryName}
         </h3>
         <p className="text-sm sm:text-base line-clamp-2 leading-relaxed text-muted">
-          {category.description}
+          {categoryDescription}
         </p>
         <div className="pt-4 border-t border-card group-hover:border-luxury-gold/40 transition-colors duration-300">
           <p className="text-luxury-gold text-sm sm:text-base font-semibold group-hover:text-luxury-gold-light transition-colors duration-300">
-            {category.productCount} منتج
+            {category.productCount}{" "}
+            {category.productCount === 1
+              ? t("categoryCard.product")
+              : t("categoryCard.products")}
           </p>
         </div>
       </div>

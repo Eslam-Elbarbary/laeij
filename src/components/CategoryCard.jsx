@@ -53,13 +53,13 @@ const CategoryCard = ({ category }) => {
         <h3 className="font-bold text-xl sm:text-2xl md:text-2xl text-primary group-hover:text-luxury-gold-light transition-colors duration-300">
           {categoryName}
         </h3>
-        <p className="text-sm sm:text-base line-clamp-2 leading-relaxed text-muted">
-          {categoryDescription}
+        <p className="text-sm sm:text-base line-clamp-2 leading-relaxed text-muted" dangerouslySetInnerHTML={{__html: categoryDescription}}>
+          
         </p>
         <div className="pt-4 border-t border-card group-hover:border-luxury-gold/40 transition-colors duration-300">
           <p className="text-luxury-gold text-sm sm:text-base font-semibold group-hover:text-luxury-gold-light transition-colors duration-300">
-            {category.productCount}{" "}
-            {category.productCount === 1
+            {category.products_count}{" "}
+            {category.products_count === 1
               ? t("categoryCard.product")
               : t("categoryCard.products")}
           </p>

@@ -1,13 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
+import apiService from "../services/api";
 
 const HeroSlider = () => {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const slides = [
+  // Default fallback slides
+  const defaultSlides = [
     {
       title: t("hero.slide1Title"),
       description: t("hero.slide1Description"),
@@ -49,27 +54,173 @@ const HeroSlider = () => {
     },
   ];
 
+  // Helper function to get image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (typeof imagePath === "string") {
+      if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+        return imagePath;
+      }
+      const baseUrl =
+        import.meta.env.VITE_API_URL || "https://laeij.teamqeematech.site/api";
+      const cleanBaseUrl = baseUrl.replace(/\/api$/, "");
+      if (imagePath.startsWith("/")) {
+        return `${cleanBaseUrl}${imagePath}`;
+      }
+      return `${cleanBaseUrl}/${imagePath}`;
+    }
+    if (imagePath && typeof imagePath === "object" && imagePath.path) {
+      return getImageUrl(imagePath.path);
+    }
+    return null;
+  };
+
+  // Fetch sliders from API
   useEffect(() => {
-    if (isPaused) return;
+    const fetchSliders = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getSliders();
+
+        if (
+          response.success &&
+          response.data &&
+          Array.isArray(response.data) &&
+          response.data.length > 0
+        ) {
+          // Filter active sliders and map to component format
+          const formattedSlides = response.data
+            .filter(
+              (slider) => slider.is_active !== false && slider.is_active !== 0
+            )
+            .sort(
+              (a, b) =>
+                (a.order || a.position || 0) - (b.order || b.position || 0)
+            )
+            .map((slider) => {
+              // Get title (support both Arabic and English)
+              const title =
+                (i18n.language === "ar" && slider.title_ar
+                  ? slider.title_ar
+                  : slider.title) ||
+                slider.name ||
+                "";
+
+              // Get description (support both Arabic and English)
+              const description =
+                (i18n.language === "ar" && slider.description_ar
+                  ? slider.description_ar
+                  : slider.description) || "";
+
+              // Get image URL
+              const image = getImageUrl(
+                slider.image ||
+                  slider.image_path ||
+                  slider.path ||
+                  slider.url ||
+                  slider.thumb_image
+              );
+
+              // Get button links
+              const primaryLink =
+                slider.link ||
+                slider.url ||
+                slider.button_link ||
+                slider.primary_link ||
+                "/products";
+              const secondaryLink =
+                slider.secondary_link || slider.secondary_url || "/categories";
+
+              // Get button texts
+              const primaryButtonText =
+                (i18n.language === "ar" && slider.button_text_ar
+                  ? slider.button_text_ar
+                  : slider.button_text) ||
+                slider.primary_button_text ||
+                t("hero.slide1PrimaryButton");
+              const secondaryButtonText =
+                slider.secondary_button_text || t("hero.slide1SecondaryButton");
+
+              return {
+                id: slider.id,
+                title,
+                description,
+                primaryButton: {
+                  text: primaryButtonText,
+                  link: primaryLink,
+                },
+                secondaryButton: {
+                  text: secondaryButtonText,
+                  link: secondaryLink,
+                },
+                image: image || defaultSlides[0].image,
+                overlay:
+                  slider.overlay || "from-black/70 via-black/50 to-black/60",
+              };
+            });
+
+          if (formattedSlides.length > 0) {
+            setSlides(formattedSlides);
+          } else {
+            // Fallback to default slides if no valid sliders
+            setSlides(defaultSlides);
+          }
+        } else {
+          // Fallback to default slides if API fails or returns no data
+          setSlides(defaultSlides);
+        }
+      } catch (error) {
+        console.error("Error fetching sliders:", error);
+        // Fallback to default slides on error
+        setSlides(defaultSlides);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSliders();
+  }, [t, i18n.language]);
+
+  useEffect(() => {
+    if (isPaused || !slides || slides.length === 0) return;
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isPaused, slides.length]);
+  }, [isPaused, slides]);
 
   const goToSlide = (index) => {
+    if (slides.length === 0) return;
     setCurrentSlide(index);
   };
 
   const nextSlide = () => {
+    if (slides.length === 0) return;
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
+    if (slides.length === 0) return;
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
+
+  // Don't render if loading and no slides
+  if (loading && slides.length === 0) {
+    return (
+      <section className="w-screen relative left-1/2 -translate-x-1/2 h-[650px] md:h-[750px] lg:h-[850px] xl:h-[950px] mb-16 md:mb-20 lg:mb-24 overflow-hidden">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // Don't render if no slides available
+  if (!slides || slides.length === 0) {
+    return null;
+  }
 
   return (
     <section

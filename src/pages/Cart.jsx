@@ -17,8 +17,12 @@ const Cart = () => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
-  const { showToast } = useToast();
   const { isAuthenticated } = useAuth();
+
+  const { showToast } = useToast();
+
+  // Note: Cart is automatically fetched by CartContext on mount
+  // No need to manually refresh here as it would restore deleted items
   const [discountCode, setDiscountCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
   const [discountError, setDiscountError] = useState("");
@@ -65,8 +69,8 @@ const Cart = () => {
     showToast(t("cart.removeDiscount"), "info");
   };
 
-  const handleRemoveItem = (itemId, itemName) => {
-    removeFromCart(itemId);
+  const handleRemoveItem = (itemId, itemName, variant_id) => {
+    removeFromCart(itemId, variant_id);
     showToast(t("cart.removedFromCart", { name: itemName }), "success");
   };
 
@@ -159,21 +163,33 @@ const Cart = () => {
                       <img
                         src={
                           item.image ||
-                          "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop&q=80&auto=format"
+                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%2392400e' width='400' height='400'/%3E%3Ctext fill='%23ffffff' font-family='sans-serif' font-size='24' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EProduct%3C/text%3E%3C/svg%3E"
                         }
                         alt={getTranslatedName(item)}
                         className="absolute inset-0 w-full h-full object-cover object-center"
                         onError={(e) => {
                           e.target.src =
-                            "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop&q=80&auto=format";
+                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%2392400e' width='400' height='400'/%3E%3Ctext fill='%23ffffff' font-family='sans-serif' font-size='24' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EProduct%3C/text%3E%3C/svg%3E";
+                          e.target.onerror = null; // Prevent infinite loop
                         }}
                       />
                     </div>
-
                     {/* Product Details */}
-                    <div className={`flex-1 ${i18n.language === "ar" ? "text-right order-2" : "text-left order-2"}`}>
+                    <div
+                      className={`flex-1 ${
+                        i18n.language === "ar"
+                          ? "text-right order-2"
+                          : "text-left order-2"
+                      }`}
+                    >
                       {/* Quantity Controls */}
-                      <div className={`flex items-center gap-2 mb-4 md:mb-6 ${i18n.language === "ar" ? "justify-end flex-row-reverse" : "justify-start"}`}>
+                      <div
+                        className={`flex items-center gap-2 mb-4 md:mb-6 ${
+                          i18n.language === "ar"
+                            ? "justify-end flex-row-reverse"
+                            : "justify-start"
+                        }`}
+                      >
                         <button
                           onClick={() => handleUpdateQuantity(item.id, -1)}
                           className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center font-bold text-lg focus:outline-none focus:ring-4 focus:ring-luxury-gold/40 transition-colors ${
@@ -203,43 +219,38 @@ const Cart = () => {
                       <h3 className="text-primary font-bold text-lg md:text-xl lg:text-2xl mb-3">
                         {getTranslatedName(item)}
                       </h3>
-                      
+
                       {/* Product Category */}
                       <p className="text-muted text-sm md:text-base mb-4 md:mb-5">
                         {getTranslatedCategory(item.category, item.categoryId)}
                       </p>
-                      
+
                       {/* Price */}
                       <p className="text-amber-500 font-bold text-xl md:text-2xl lg:text-3xl mb-5">
                         {item.price * item.quantity} {t("productCard.currency")}
                       </p>
 
                       {/* Add Note Button */}
-                      <button className={`text-amber-500 text-base md:text-lg flex items-center gap-2 hover:text-amber-400 transition-colors focus:outline-none focus:ring-4 focus:ring-amber-700/50 rounded-lg px-3 py-2 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+                      <button
+                        className={`text-amber-500 text-base md:text-lg flex items-center gap-2 hover:text-amber-400 transition-colors focus:outline-none focus:ring-4 focus:ring-amber-700/50 rounded-lg px-3 py-2 ${
+                          i18n.language === "ar" ? "flex-row-reverse" : ""
+                        }`}
+                      >
                         <span>+</span>
                         <span>{t("cart.addNote")}</span>
                       </button>
                     </div>
-
                     {/* Delete Button */}
                     <button
-                      onClick={() => handleRemoveItem(item.id, item.name)}
-                      className={`text-red-500 hover:text-red-600 transition-colors p-2 hover:bg-red-500/10 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-500/50 flex items-center justify-center flex-shrink-0 ${i18n.language === "ar" ? "order-1" : "order-3"}`}
-                      aria-label="Remove item"
+                      onClick={() =>
+                        removeFromCart(
+                          item.cartItemId || item.id,
+                          item.variantId || item.pack_size_id
+                        )
+                      }
+                      className="text-red-600 hover:text-red-800"
                     >
-                      <svg
-                        className="w-5 h-5 md:w-6 md:h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
+                      حذف
                     </button>
                   </div>
                 ))}

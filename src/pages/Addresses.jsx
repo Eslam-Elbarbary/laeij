@@ -6,7 +6,14 @@ import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
+import apiService from "../services/api";
 
+/**
+ * Addresses Page
+ * 
+ * Manages user's saved addresses using the real API.
+ * Supports creating, updating, and deleting addresses.
+ */
 const Addresses = () => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
@@ -14,26 +21,72 @@ const Addresses = () => {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const hasShownToast = useRef(false);
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      type: t("addresses.demoAddress1.type"),
-      location: t("addresses.demoAddress1.location"),
-      details: t("addresses.demoAddress1.details"),
-    },
-    {
-      id: 2,
-      type: t("addresses.demoAddress2.type"),
-      location: t("addresses.demoAddress2.location"),
-      details: t("addresses.demoAddress2.details"),
-    },
-  ]);
+  
+  // State management
+  const [addresses, setAddresses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState({
-    type: "",
-    location: "",
-    details: "",
+    name: "",
+    phone: "",
+    address: "",
+    city: "",
+    country: "",
+    state: "",
+    postal_code: "",
   });
+
+  /**
+   * Fetch addresses from API
+   */
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      if (isAuthenticated) {
+        try {
+          setLoading(true);
+          setError(null);
+          const response = await apiService.getAddresses();
+          
+          if (response.success && response.data) {
+            // Transform API response to match our address structure
+            const formattedAddresses = Array.isArray(response.data)
+              ? response.data.map((addr) => ({
+                  id: addr.id,
+                  type: addr.name || addr.type || t("addresses.home"),
+                  location: `${addr.city || ""}, ${addr.country || ""}`.trim(),
+                  details: addr.address || "",
+                  // Store full data for editing
+                  fullData: {
+                    name: addr.name || "",
+                    phone: addr.phone || "",
+                    address: addr.address || "",
+                    city: addr.city || "",
+                    country: addr.country || "",
+                    state: addr.state || "",
+                    postal_code: addr.postal_code || "",
+                  },
+                }))
+              : [];
+            setAddresses(formattedAddresses);
+          } else {
+            setAddresses([]);
+          }
+        } catch (err) {
+          console.error("Error fetching addresses:", err);
+          setError(t("addresses.errorLoading"));
+          setAddresses([]);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchAddresses();
+    }
+  }, [isAuthenticated, t]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -44,58 +97,141 @@ const Addresses = () => {
     }
   }, [isAuthenticated, navigate, showToast, t]);
 
-  // Update demo addresses when language changes (preserve other addresses)
-  useEffect(() => {
-    setAddresses((prevAddresses) => {
-      const otherAddresses = prevAddresses.filter((addr) => addr.id !== 1 && addr.id !== 2);
-      return [
-        {
-          id: 1,
-          type: t("addresses.demoAddress1.type"),
-          location: t("addresses.demoAddress1.location"),
-          details: t("addresses.demoAddress1.details"),
-        },
-        {
-          id: 2,
-          type: t("addresses.demoAddress2.type"),
-          location: t("addresses.demoAddress2.location"),
-          details: t("addresses.demoAddress2.details"),
-        },
-        ...otherAddresses,
-      ];
-    });
-  }, [i18n.language, t]);
-
   // Don't render if not authenticated
   if (!isAuthenticated) {
     return null;
   }
 
-  const handleDelete = (id) => {
+  /**
+   * Delete address
+   * Note: Backend may not support DELETE endpoint yet
+   */
+  const handleDelete = async (id) => {
     if (window.confirm(t("addresses.deleteConfirm"))) {
-      setAddresses(addresses.filter((addr) => addr.id !== id));
-      showToast(t("addresses.addressDeleted"), "success");
+      try {
+        const response = await apiService.deleteAddress(id);
+        if (response.success) {
+          setAddresses(addresses.filter((addr) => addr.id !== id));
+          showToast(t("addresses.addressDeleted"), "success");
+        } else {
+          // Check if it's a route not found error
+          const errorMessage = response.message || "";
+          if (errorMessage.includes("could not be found") || errorMessage.includes("route") || response.routeNotFound) {
+            showToast(t("addresses.featureNotAvailable") || "Delete address feature is not available yet", "error");
+          } else {
+            showToast(errorMessage || t("addresses.errorDeleting"), "error");
+          }
+        }
+      } catch (err) {
+        const errorMessage = err.response?.data?.message || err.message || "";
+        if (errorMessage.includes("could not be found") || errorMessage.includes("route") || err.response?.status === 404) {
+          showToast(t("addresses.featureNotAvailable") || "Delete address feature is not available yet", "error");
+          // Don't log route-not-found errors to console (they're expected)
+        } else {
+          console.error("Error deleting address:", err);
+          showToast(t("addresses.errorDeleting"), "error");
+        }
+      }
     }
   };
 
+  /**
+   * Start editing address
+   */
   const handleEdit = (address) => {
     setEditingId(address.id);
-    setEditForm({
-      type: address.type,
-      location: address.location,
-      details: address.details,
+    setIsAddingNew(false);
+    setEditForm(address.fullData || {
+      name: address.type || "",
+      phone: "",
+      address: address.details || "",
+      city: address.location?.split(",")[0]?.trim() || "",
+      country: address.location?.split(",")[1]?.trim() || "",
+      state: "",
+      postal_code: "",
     });
   };
 
-  const handleSaveEdit = () => {
-    setAddresses(
-      addresses.map((addr) =>
-        addr.id === editingId ? { ...addr, ...editForm } : addr
-      )
-    );
-    setEditingId(null);
-    setEditForm({ type: "", location: "", details: "" });
-    showToast(t("addresses.addressUpdated"), "success");
+  /**
+   * Save address (create or update)
+   * POST /addresses or PUT /addresses/:id
+   */
+  const handleSaveEdit = async () => {
+    try {
+      // Validate required fields
+      if (!editForm.name || !editForm.phone || !editForm.address || !editForm.city || !editForm.country) {
+        showToast(t("addresses.fillRequiredFields"), "error");
+        return;
+      }
+
+      let response;
+      if (isAddingNew) {
+        // Create new address
+        response = await apiService.createAddress(editForm);
+      } else {
+        // Update existing address
+        response = await apiService.updateAddress(editingId, editForm);
+      }
+
+      if (response.success) {
+        // Refresh addresses list
+        const addressesResponse = await apiService.getAddresses();
+        if (addressesResponse.success && addressesResponse.data) {
+          const formattedAddresses = Array.isArray(addressesResponse.data)
+            ? addressesResponse.data.map((addr) => ({
+                id: addr.id,
+                type: addr.name || addr.type || t("addresses.home"),
+                location: `${addr.city || ""}, ${addr.country || ""}`.trim(),
+                details: addr.address || "",
+                fullData: {
+                  name: addr.name || "",
+                  phone: addr.phone || "",
+                  address: addr.address || "",
+                  city: addr.city || "",
+                  country: addr.country || "",
+                  state: addr.state || "",
+                  postal_code: addr.postal_code || "",
+                },
+              }))
+            : [];
+          setAddresses(formattedAddresses);
+        }
+        setEditingId(null);
+        setIsAddingNew(false);
+        setEditForm({
+          name: "",
+          phone: "",
+          address: "",
+          city: "",
+          country: "",
+          state: "",
+          postal_code: "",
+        });
+        showToast(
+          isAddingNew 
+            ? t("addresses.addressAdded") 
+            : t("addresses.addressUpdated"), 
+          "success"
+        );
+      } else {
+        // Check if it's a route not found error
+        const errorMessage = response.message || "";
+        if (errorMessage.includes("could not be found") || errorMessage.includes("route") || response.routeNotFound) {
+          showToast(t("addresses.featureNotAvailable") || "Update address feature is not available yet", "error");
+        } else {
+          showToast(errorMessage || t("addresses.errorSaving"), "error");
+        }
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || "";
+      if (errorMessage.includes("could not be found") || errorMessage.includes("route") || err.response?.status === 404) {
+        showToast(t("addresses.featureNotAvailable") || "Update address feature is not available yet", "error");
+        // Don't log route-not-found errors to console (they're expected)
+      } else {
+        console.error("Error saving address:", err);
+        showToast(t("addresses.errorSaving"), "error");
+      }
+    }
   };
 
   const handleCancelEdit = () => {
@@ -125,8 +261,101 @@ const Addresses = () => {
           <p className="text-muted">{t("addresses.subtitle")}</p>
         </div>
 
-        <div className="space-y-4">
-          {addresses.map((address) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-luxury-gold"></div>
+            <p className="mt-4 text-muted">{t("common.loading")}</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12 text-red-400">
+            <p>{error}</p>
+          </div>
+        ) : (
+          <>
+            {/* Add New Address Form */}
+            {isAddingNew && (
+              <div className={`${panelClasses} rounded-2xl p-4 md:p-6 transition-shadow shadow-md`}>
+                <div className={`space-y-4 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <h3 className="text-lg font-semibold mb-4">{t("addresses.addNewAddress")}</h3>
+                  <input
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                    placeholder={t("addresses.addressType")}
+                    dir={i18n.language === "ar" ? "rtl" : "ltr"}
+                  />
+                  <input
+                    type="text"
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                    placeholder={t("addresses.phone")}
+                    dir={i18n.language === "ar" ? "rtl" : "ltr"}
+                  />
+                  <input
+                    type="text"
+                    value={editForm.address}
+                    onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                    className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                    placeholder={t("addresses.address")}
+                    dir={i18n.language === "ar" ? "rtl" : "ltr"}
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      value={editForm.city}
+                      onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                      className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                      placeholder={t("addresses.city")}
+                      dir={i18n.language === "ar" ? "rtl" : "ltr"}
+                    />
+                    <input
+                      type="text"
+                      value={editForm.country}
+                      onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+                      className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                      placeholder={t("addresses.country")}
+                      dir={i18n.language === "ar" ? "rtl" : "ltr"}
+                    />
+                  </div>
+                  <div className={`flex gap-2 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+                    <button
+                      onClick={handleSaveEdit}
+                      className="flex-1 bg-luxury-gold hover:bg-luxury-gold-light text-luxury-brown-darker py-2 rounded-lg font-semibold transition-colors"
+                    >
+                      {t("addresses.save")}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsAddingNew(false);
+                        setEditForm({
+                          name: "",
+                          phone: "",
+                          address: "",
+                          city: "",
+                          country: "",
+                          state: "",
+                          postal_code: "",
+                        });
+                      }}
+                      className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg font-semibold transition-colors"
+                    >
+                      {t("addresses.cancel")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Existing Addresses */}
+            <div className="space-y-4">
+              {addresses.length === 0 && !isAddingNew ? (
+                <div className="text-center py-12 text-muted">
+                  <p>{t("addresses.noAddresses")}</p>
+                </div>
+              ) : (
+                addresses.map((address) => (
             <div
               key={address.id}
               className={`${panelClasses} rounded-2xl p-4 md:p-6 transition-shadow shadow-md hover:shadow-xl`}
@@ -135,34 +364,46 @@ const Addresses = () => {
                 <div className={`space-y-4 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
                   <input
                     type="text"
-                    value={editForm.type}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, type: e.target.value })
-                    }
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                     className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                     placeholder={t("addresses.addressType")}
                     dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   />
                   <input
                     type="text"
-                    value={editForm.location}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, location: e.target.value })
-                    }
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
                     className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
-                    placeholder={t("addresses.location")}
+                    placeholder={t("addresses.phone")}
                     dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   />
-                  <textarea
-                    value={editForm.details}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, details: e.target.value })
-                    }
+                  <input
+                    type="text"
+                    value={editForm.address}
+                    onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
                     className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
-                    placeholder={t("addresses.details")}
-                    rows={3}
+                    placeholder={t("addresses.address")}
                     dir={i18n.language === "ar" ? "rtl" : "ltr"}
                   />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      value={editForm.city}
+                      onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                      className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                      placeholder={t("addresses.city")}
+                      dir={i18n.language === "ar" ? "rtl" : "ltr"}
+                    />
+                    <input
+                      type="text"
+                      value={editForm.country}
+                      onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+                      className={`w-full px-4 py-2 rounded-lg ${inputClasses} ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                      placeholder={t("addresses.country")}
+                      dir={i18n.language === "ar" ? "rtl" : "ltr"}
+                    />
+                  </div>
                   <div className={`flex gap-2 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
                     <button
                       onClick={handleSaveEdit}
@@ -233,21 +474,25 @@ const Addresses = () => {
                 </div>
               )}
             </div>
-          ))}
-        </div>
+                ))
+              )}
+            </div>
+          </>
+        )}
 
         <button
           onClick={() => {
-            const newAddress = {
-              id: Date.now(),
-              type: t("addresses.newAddress"),
-              location: t("addresses.enterLocation"),
-              details: t("addresses.enterDetails"),
-            };
-            setAddresses([...addresses, newAddress]);
-            setEditingId(newAddress.id);
-            setEditForm({ type: "", location: "", details: "" });
-            showToast(t("addresses.addressAdded"), "success");
+            setIsAddingNew(true);
+            setEditingId(null);
+            setEditForm({
+              name: "",
+              phone: "",
+              address: "",
+              city: "",
+              country: "",
+              state: "",
+              postal_code: "",
+            });
           }}
           className={`w-full mb-[100px] ${buttonClasses} py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-4 focus:ring-luxury-gold/40 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}
         >

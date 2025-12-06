@@ -29,6 +29,15 @@ const Footer = () => {
     ],
     support: [
       { label: t("footer.contactUs"), path: "/contact" },
+      { label: t("footer.branches") || "Our Branches", path: "/branches" },
+      {
+        label: t("footer.supportTickets") || "Support Tickets",
+        path: "/tickets",
+      },
+      {
+        label: t("footer.bookingLists") || "Booking Lists",
+        path: "/booking-lists",
+      },
       { label: t("footer.faq"), path: "/faq" },
       { label: t("footer.returnPolicy"), path: "/return-policy" },
       { label: t("footer.terms"), path: "/terms" },

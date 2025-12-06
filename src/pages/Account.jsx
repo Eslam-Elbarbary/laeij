@@ -56,7 +56,7 @@ const Account = () => {
       return { badge: t("account.badges.newMember"), discount: "5%" };
     }
   };
-  
+
   // Change language handler
   const changeLanguage = (lng) => {
     i18nInstance.changeLanguage(lng);
@@ -87,6 +87,28 @@ const Account = () => {
       label: t("account.menuItems.orders.label"),
       description: t("account.menuItems.orders.description"),
       path: "/orders",
+    },
+    {
+      icon: "💵",
+      label: t("account.menuItems.transactions.label"),
+      description: t("account.menuItems.transactions.description"),
+      path: "/transactions",
+    },
+    {
+      icon: "🎫",
+      label: t("account.menuItems.tickets.label") || "Support Tickets",
+      description:
+        t("account.menuItems.tickets.description") ||
+        "View and manage your support tickets",
+      path: "/tickets",
+    },
+    {
+      icon: "📋",
+      label: t("account.menuItems.bookingLists.label") || "Booking Lists",
+      description:
+        t("account.menuItems.bookingLists.description") ||
+        "Manage your product bookings",
+      path: "/booking-lists",
     },
     {
       icon: "🏷️",
@@ -131,12 +153,18 @@ const Account = () => {
               >
                 <span className="text-5xl md:text-6xl">👤</span>
               </div>
-              <div className={`flex-1 text-center ${i18n.language === "ar" ? "md:text-right" : "md:text-left"}`}>
+              <div
+                className={`flex-1 text-center ${
+                  i18n.language === "ar" ? "md:text-right" : "md:text-left"
+                }`}
+              >
                 <h2 className="text-2xl lg:text-3xl font-bold mb-2 md:mb-3 text-primary dark:text-[#F3EDE6]">
                   {user.name || t("account.user")}
                 </h2>
                 <p className="text-base md:text-lg text-muted dark:text-[#BBAA9D]">
-                  {user.phone ? `+971 ${formatPhone(user.phone)}` : t("account.notAvailable")}
+                  {user.phone
+                    ? `+971 ${formatPhone(user.phone)}`
+                    : t("account.notAvailable")}
                 </p>
                 <p className="text-base md:text-lg text-muted dark:text-[#BBAA9D]">
                   {user.email || t("account.notAvailable")}
@@ -145,12 +173,16 @@ const Account = () => {
             </div>
 
             <div
-              className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-3 md:gap-4 p-4 md:p-5 rounded-xl border-2
+              className={`flex ${
+                i18n.language === "ar" ? "flex-row-reverse" : ""
+              } items-center gap-3 md:gap-4 p-4 md:p-5 rounded-xl border-2
               bg-card-muted dark:bg-[#2A1F19]
               border-card dark:border-[#5C3D28]`}
             >
               <span className="text-3xl md:text-4xl">🏆</span>
-              <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
+              <div
+                className={i18n.language === "ar" ? "text-right" : "text-left"}
+              >
                 <p className="font-semibold text-lg md:text-xl text-luxury-gold dark:text-amber-400">
                   {userBadge.badge}
                 </p>
@@ -163,7 +195,11 @@ const Account = () => {
 
           {/* Account Section */}
           <div>
-            <h3 className={`text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-primary dark:text-[#F3EDE6] ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+            <h3
+              className={`text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-primary dark:text-[#F3EDE6] ${
+                i18n.language === "ar" ? "text-right" : "text-left"
+              }`}
+            >
               {t("account.accountSection")}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -171,7 +207,9 @@ const Account = () => {
                 <button
                   key={index}
                   onClick={() => navigate(item.path)}
-                  className={`flex items-center ${i18n.language === "ar" ? "flex-row-reverse" : ""} gap-4 md:gap-6 p-6 md:p-8 rounded-2xl border-2 shadow-lg transition-all
+                  className={`flex items-center ${
+                    i18n.language === "ar" ? "flex-row-reverse" : ""
+                  } gap-4 md:gap-6 p-6 md:p-8 rounded-2xl border-2 shadow-lg transition-all
                     bg-card dark:bg-[#1C1613]
                     border-card dark:border-[#3E2C21] hover:border-luxury-gold/50`}
                 >
@@ -180,8 +218,18 @@ const Account = () => {
                       →
                     </span>
                   )}
-                  <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-4 md:gap-6 flex-1 ${i18n.language === "ar" ? "justify-end" : "justify-start"}`}>
-                    <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
+                  <div
+                    className={`flex ${
+                      i18n.language === "ar" ? "flex-row-reverse" : ""
+                    } items-center gap-4 md:gap-6 flex-1 ${
+                      i18n.language === "ar" ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={
+                        i18n.language === "ar" ? "text-right" : "text-left"
+                      }
+                    >
                       <p className="font-semibold text-lg md:text-xl text-primary dark:text-[#F3EDE6]">
                         {item.label}
                       </p>
@@ -206,22 +254,28 @@ const Account = () => {
           {/* Preferences Section */}
           <div>
             <h3
-              className={`text-3xl  md:text-4xl font-bold mb-8 md:mb-10 ${i18n.language === "ar" ? "text-right" : "text-left"} ${
-                isDark ? "text-white" : "text-luxury-brown-text"
-              }`}
+              className={`text-3xl  md:text-4xl font-bold mb-8 md:mb-10 ${
+                i18n.language === "ar" ? "text-right" : "text-left"
+              } ${isDark ? "text-white" : "text-luxury-brown-text"}`}
             >
               {t("account.preferences")}
             </h3>
             <div className="space-y-5 md:space-y-6">
               {/* Notifications */}
               <div
-                className={`ltr flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center justify-between p-7 md:p-9 rounded-2xl border-2 shadow-xl transition-all hover:shadow-2xl ${
+                className={`ltr flex ${
+                  i18n.language === "ar" ? "flex-row-reverse" : ""
+                } items-center justify-between p-7 md:p-9 rounded-2xl border-2 shadow-xl transition-all hover:shadow-2xl ${
                   isDark
                     ? "bg-card border-card hover:border-luxury-gold/50"
                     : "bg-card border-card hover:border-luxury-gold/50"
                 }`}
               >
-                <div className={` flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-5 md:gap-7`}>
+                <div
+                  className={` flex ${
+                    i18n.language === "ar" ? "flex-row-reverse" : ""
+                  } items-center gap-5 md:gap-7`}
+                >
                   <div
                     className={`w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-3xl md:text-4xl ${
                       isDark ? "bg-luxury-gold/20" : "bg-luxury-gold/15"
@@ -229,7 +283,11 @@ const Account = () => {
                   >
                     🔔
                   </div>
-                  <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
+                  <div
+                    className={
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }
+                  >
                     <p
                       className={`font-bold text-xl md:text-2xl mb-2 ${
                         isDark ? "text-white" : "text-luxury-brown-text"
@@ -280,14 +338,22 @@ const Account = () => {
 
               {/* Language */}
               <div
-                onClick={() => changeLanguage(i18n.language === "ar" ? "en" : "ar")}
-                className={`ltr flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center justify-between p-7 md:p-9 rounded-2xl border-2 shadow-xl cursor-pointer transition-all hover:shadow-2xl hover:scale-[1.01] ${
+                onClick={() =>
+                  changeLanguage(i18n.language === "ar" ? "en" : "ar")
+                }
+                className={`ltr flex ${
+                  i18n.language === "ar" ? "flex-row-reverse" : ""
+                } items-center justify-between p-7 md:p-9 rounded-2xl border-2 shadow-xl cursor-pointer transition-all hover:shadow-2xl hover:scale-[1.01] ${
                   isDark
                     ? "bg-card border-card hover:border-luxury-gold/50"
                     : "bg-card border-card hover:border-luxury-gold/50"
                 }`}
               >
-                <div className={`flex ${i18n.language === "ar" ? "flex-row-reverse" : ""} items-center gap-5 md:gap-7`}>
+                <div
+                  className={`flex ${
+                    i18n.language === "ar" ? "flex-row-reverse" : ""
+                  } items-center gap-5 md:gap-7`}
+                >
                   <div
                     className={`w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-3xl md:text-4xl ${
                       isDark ? "bg-luxury-gold/20" : "bg-luxury-gold/15"
@@ -295,7 +361,11 @@ const Account = () => {
                   >
                     🌐
                   </div>
-                  <div className={i18n.language === "ar" ? "text-right" : "text-left"}>
+                  <div
+                    className={
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }
+                  >
                     <p
                       className={`font-bold text-xl md:text-2xl mb-2 ${
                         isDark ? "text-white" : "text-luxury-brown-text"
@@ -310,7 +380,9 @@ const Account = () => {
                           : "text-luxury-brown-text/70"
                       }`}
                     >
-                      {i18n.language === "ar" ? t("account.arabic") : t("account.english")}
+                      {i18n.language === "ar"
+                        ? t("account.arabic")
+                        : t("account.english")}
                     </p>
                   </div>
                 </div>

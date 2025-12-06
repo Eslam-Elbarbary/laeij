@@ -1,0 +1,2549 @@
+{
+	"info": {
+		"_postman_id": "a7a6ffd5-e9d5-4c13-93d9-8ab3cb52b2f2",
+		"name": "Laeij",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35577645",
+		"_collection_link": "https://universal-comet-690952.postman.co/workspace/My-Workspace~ca112382-9069-4594-86e2-cd97247494b1/collection/35577645-a7a6ffd5-e9d5-4c13-93d9-8ab3cb52b2f2?action=share&source=collection_link&creator=35577645"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "authantication",
+					"item": [
+						{
+							"name": "register",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test user",
+											"description": "required | string | max:255",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+20123456700",
+											"description": "required | string | max:255 | unique:users,phone",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "test@user.com1",
+											"description": "required | email | unique:users,email",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456789",
+											"description": "required | string",
+											"type": "text"
+										},
+										{
+											"key": "password_confirmation",
+											"value": "123456789",
+											"description": "required | string | same:password",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"description": "nullable  | image | max:2048",
+											"type": "file",
+											"src": "/C:/Users/Qeema/Downloads/Frame 1171277203.png"
+										},
+										{
+											"key": "gender",
+											"value": "male",
+											"description": "nullable | in:male,female",
+											"type": "text"
+										},
+										{
+											"key": "invitation_code",
+											"value": "218565",
+											"description": "nullable | exists:users,invitation_code",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/auth/register",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "### Register User Endpoint\n\nThis endpoint allows new users to register by providing their personal details. Upon successful registration, a confirmation response will be returned.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{base-url}}/auth/register`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n##### Request Body Parameters:\n\n- **name** (string): The full name of the user.\n    \n- **phone** (string): The phone number of the user.\n    \n- **password** (string): The password for the user's account.\n    \n- **password_confirmation** (string): A confirmation of the user's password to ensure it matches the original.\n    \n\n#### Response\n\n- **Status Code**: 200\n    \n- **Content-Type**: `application/json`\n    \n\n##### Response Body:\n\n- **message** (string): A message indicating the result of the registration process.\n    \n- **data** (object): Contains the following fields:\n    \n    - **name** (string): The name of the registered user.\n        \n    - **phone** (string): The phone number of the registered user.\n        \n    - **verification_code** (integer): A code used for verifying the user's phone number.\n        \n    - **status** (integer): The registration status of the user.\n        \n    - **updated_at** (string): Timestamp of when the user data was last updated.\n        \n    - **created_at** (string): Timestamp of when the user was created.\n        \n    - **id** (integer): The unique identifier for the registered user.\n        \n\n#### Notes\n\n- Ensure that the password and password confirmation match to avoid registration errors.\n    \n- The verification code may be required for subsequent actions such as logging in or verifying the account."
+							},
+							"response": []
+						},
+						{
+							"name": "verify-phone",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "test@user.com",
+											"description": "required | string | max:255 | unique:users,email",
+											"type": "text"
+										},
+										{
+											"key": "code",
+											"value": "123456",
+											"description": "required | digits:6",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/auth/verify",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"verify"
+									]
+								},
+								"description": "### Register User Endpoint\n\nThis endpoint allows new users to register by providing their personal details. Upon successful registration, a confirmation response will be returned.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{base-url}}/auth/register`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n##### Request Body Parameters:\n\n- **name** (string): The full name of the user.\n    \n- **phone** (string): The phone number of the user.\n    \n- **password** (string): The password for the user's account.\n    \n- **password_confirmation** (string): A confirmation of the user's password to ensure it matches the original.\n    \n\n#### Response\n\n- **Status Code**: 200\n    \n- **Content-Type**: `application/json`\n    \n\n##### Response Body:\n\n- **message** (string): A message indicating the result of the registration process.\n    \n- **data** (object): Contains the following fields:\n    \n    - **name** (string): The name of the registered user.\n        \n    - **phone** (string): The phone number of the registered user.\n        \n    - **verification_code** (integer): A code used for verifying the user's phone number.\n        \n    - **status** (integer): The registration status of the user.\n        \n    - **updated_at** (string): Timestamp of when the user data was last updated.\n        \n    - **created_at** (string): Timestamp of when the user was created.\n        \n    - **id** (integer): The unique identifier for the registered user.\n        \n\n#### Notes\n\n- Ensure that the password and password confirmation match to avoid registration errors.\n    \n- The verification code may be required for subsequent actions such as logging in or verifying the account."
+							},
+							"response": []
+						},
+						{
+							"name": "login",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "test@user.com",
+											"description": "required | string | max:255 | unique:users,email",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456789",
+											"description": "required | string",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/auth/login",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "### Register User Endpoint\n\nThis endpoint allows new users to register by providing their personal details. Upon successful registration, a confirmation response will be returned.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{base-url}}/auth/register`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n##### Request Body Parameters:\n\n- **name** (string): The full name of the user.\n    \n- **phone** (string): The phone number of the user.\n    \n- **password** (string): The password for the user's account.\n    \n- **password_confirmation** (string): A confirmation of the user's password to ensure it matches the original.\n    \n\n#### Response\n\n- **Status Code**: 200\n    \n- **Content-Type**: `application/json`\n    \n\n##### Response Body:\n\n- **message** (string): A message indicating the result of the registration process.\n    \n- **data** (object): Contains the following fields:\n    \n    - **name** (string): The name of the registered user.\n        \n    - **phone** (string): The phone number of the registered user.\n        \n    - **verification_code** (integer): A code used for verifying the user's phone number.\n        \n    - **status** (integer): The registration status of the user.\n        \n    - **updated_at** (string): Timestamp of when the user data was last updated.\n        \n    - **created_at** (string): Timestamp of when the user was created.\n        \n    - **id** (integer): The unique identifier for the registered user.\n        \n\n#### Notes\n\n- Ensure that the password and password confirmation match to avoid registration errors.\n    \n- The verification code may be required for subsequent actions such as logging in or verifying the account."
+							},
+							"response": []
+						},
+						{
+							"name": "logout",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "1|cDOJyC6GJc2UVZJBeJSb1AzyM15ya26I8zxYqZFbc790a468",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base-url}}/auth/logout",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"logout"
+									]
+								},
+								"description": "### Register User Endpoint\n\nThis endpoint allows new users to register by providing their personal details. Upon successful registration, a confirmation response will be returned.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{base-url}}/auth/register`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n##### Request Body Parameters:\n\n- **name** (string): The full name of the user.\n    \n- **phone** (string): The phone number of the user.\n    \n- **password** (string): The password for the user's account.\n    \n- **password_confirmation** (string): A confirmation of the user's password to ensure it matches the original.\n    \n\n#### Response\n\n- **Status Code**: 200\n    \n- **Content-Type**: `application/json`\n    \n\n##### Response Body:\n\n- **message** (string): A message indicating the result of the registration process.\n    \n- **data** (object): Contains the following fields:\n    \n    - **name** (string): The name of the registered user.\n        \n    - **phone** (string): The phone number of the registered user.\n        \n    - **verification_code** (integer): A code used for verifying the user's phone number.\n        \n    - **status** (integer): The registration status of the user.\n        \n    - **updated_at** (string): Timestamp of when the user data was last updated.\n        \n    - **created_at** (string): Timestamp of when the user was created.\n        \n    - **id** (integer): The unique identifier for the registered user.\n        \n\n#### Notes\n\n- Ensure that the password and password confirmation match to avoid registration errors.\n    \n- The verification code may be required for subsequent actions such as logging in or verifying the account."
+							},
+							"response": []
+						},
+						{
+							"name": "delete account",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "3|lzfPV8GNcaKrc1Sny8HrlR9tvvJVUYPYE7k9yCGXe522a299",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base-url}}/auth/delete-account",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"delete-account"
+									]
+								},
+								"description": "### Register User Endpoint\n\nThis endpoint allows new users to register by providing their personal details. Upon successful registration, a confirmation response will be returned.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{base-url}}/auth/register`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n##### Request Body Parameters:\n\n- **name** (string): The full name of the user.\n    \n- **phone** (string): The phone number of the user.\n    \n- **password** (string): The password for the user's account.\n    \n- **password_confirmation** (string): A confirmation of the user's password to ensure it matches the original.\n    \n\n#### Response\n\n- **Status Code**: 200\n    \n- **Content-Type**: `application/json`\n    \n\n##### Response Body:\n\n- **message** (string): A message indicating the result of the registration process.\n    \n- **data** (object): Contains the following fields:\n    \n    - **name** (string): The name of the registered user.\n        \n    - **phone** (string): The phone number of the registered user.\n        \n    - **verification_code** (integer): A code used for verifying the user's phone number.\n        \n    - **status** (integer): The registration status of the user.\n        \n    - **updated_at** (string): Timestamp of when the user data was last updated.\n        \n    - **created_at** (string): Timestamp of when the user was created.\n        \n    - **id** (integer): The unique identifier for the registered user.\n        \n\n#### Notes\n\n- Ensure that the password and password confirmation match to avoid registration errors.\n    \n- The verification code may be required for subsequent actions such as logging in or verifying the account."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "reset password",
+					"item": [
+						{
+							"name": "send-otp",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "test@user.com",
+											"description": "required | string | max:255 | exists:users,email",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/auth/reset-password/send-otp",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"reset-password",
+										"send-otp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "verify-otp",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "test@user.com",
+											"description": "required | string | max:255 | exists:users,email",
+											"type": "text"
+										},
+										{
+											"key": "code",
+											"value": "123456",
+											"description": "required | digits:6",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/auth/reset-password/verify-otp",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"reset-password",
+										"verify-otp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "set-new-password",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "reset_token",
+											"value": "17344c2f-01be-4086-8e53-40def57616a7",
+											"description": "required | string | exists:password_reset_tokens,token",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456789",
+											"description": "required | string | confirmed",
+											"type": "text"
+										},
+										{
+											"key": "password_confirmation",
+											"value": "123456789",
+											"description": "required | string | same:password",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/auth/reset-password/set-new-password",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"reset-password",
+										"set-new-password"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "profile",
+					"item": [
+						{
+							"name": "profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base-url}}/auth/profile",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"profile"
+									]
+								},
+								"description": "### Register User Endpoint\n\nThis endpoint allows new users to register by providing their personal details. Upon successful registration, a confirmation response will be returned.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{base-url}}/auth/register`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n##### Request Body Parameters:\n\n- **name** (string): The full name of the user.\n    \n- **phone** (string): The phone number of the user.\n    \n- **password** (string): The password for the user's account.\n    \n- **password_confirmation** (string): A confirmation of the user's password to ensure it matches the original.\n    \n\n#### Response\n\n- **Status Code**: 200\n    \n- **Content-Type**: `application/json`\n    \n\n##### Response Body:\n\n- **message** (string): A message indicating the result of the registration process.\n    \n- **data** (object): Contains the following fields:\n    \n    - **name** (string): The name of the registered user.\n        \n    - **phone** (string): The phone number of the registered user.\n        \n    - **verification_code** (integer): A code used for verifying the user's phone number.\n        \n    - **status** (integer): The registration status of the user.\n        \n    - **updated_at** (string): Timestamp of when the user data was last updated.\n        \n    - **created_at** (string): Timestamp of when the user was created.\n        \n    - **id** (integer): The unique identifier for the registered user.\n        \n\n#### Notes\n\n- Ensure that the password and password confirmation match to avoid registration errors.\n    \n- The verification code may be required for subsequent actions such as logging in or verifying the account."
+							},
+							"response": []
+						},
+						{
+							"name": "edit-profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Ahmed",
+											"description": "required | string | max:255",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "ahmed@user.com",
+											"description": "nullable | string | email | max:255 | unique:users,email",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+20123456789",
+											"description": "required | string | max:255 | unique:users,phone",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"description": "nullable | image | max:2048",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "gender",
+											"value": "male",
+											"description": "nullable | in:male,female",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/auth/edit-profile",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"edit-profile"
+									]
+								},
+								"description": "### Register User Endpoint\n\nThis endpoint allows new users to register by providing their personal details. Upon successful registration, a confirmation response will be returned.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{base-url}}/auth/register`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n##### Request Body Parameters:\n\n- **name** (string): The full name of the user.\n    \n- **phone** (string): The phone number of the user.\n    \n- **password** (string): The password for the user's account.\n    \n- **password_confirmation** (string): A confirmation of the user's password to ensure it matches the original.\n    \n\n#### Response\n\n- **Status Code**: 200\n    \n- **Content-Type**: `application/json`\n    \n\n##### Response Body:\n\n- **message** (string): A message indicating the result of the registration process.\n    \n- **data** (object): Contains the following fields:\n    \n    - **name** (string): The name of the registered user.\n        \n    - **phone** (string): The phone number of the registered user.\n        \n    - **verification_code** (integer): A code used for verifying the user's phone number.\n        \n    - **status** (integer): The registration status of the user.\n        \n    - **updated_at** (string): Timestamp of when the user data was last updated.\n        \n    - **created_at** (string): Timestamp of when the user was created.\n        \n    - **id** (integer): The unique identifier for the registered user.\n        \n\n#### Notes\n\n- Ensure that the password and password confirmation match to avoid registration errors.\n    \n- The verification code may be required for subsequent actions such as logging in or verifying the account."
+							},
+							"response": []
+						},
+						{
+							"name": "change-password",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "4|AjQscfjXDXKkjC41v0LT6xwrJSaSDBsxJomHyMCu097cdac1",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "current_password",
+											"value": "123456789",
+											"description": "required | string",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "12345678",
+											"description": "required | string | confirmed",
+											"type": "text"
+										},
+										{
+											"key": "password_confirmation",
+											"value": "12345678",
+											"description": "required | string | same:password",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base-url}}/auth/change-password",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"auth",
+										"change-password"
+									]
+								},
+								"description": "### Register User Endpoint\n\nThis endpoint allows new users to register by providing their personal details. Upon successful registration, a confirmation response will be returned.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{base-url}}/auth/register`\n    \n- **Content-Type**: `multipart/form-data`\n    \n\n##### Request Body Parameters:\n\n- **name** (string): The full name of the user.\n    \n- **phone** (string): The phone number of the user.\n    \n- **password** (string): The password for the user's account.\n    \n- **password_confirmation** (string): A confirmation of the user's password to ensure it matches the original.\n    \n\n#### Response\n\n- **Status Code**: 200\n    \n- **Content-Type**: `application/json`\n    \n\n##### Response Body:\n\n- **message** (string): A message indicating the result of the registration process.\n    \n- **data** (object): Contains the following fields:\n    \n    - **name** (string): The name of the registered user.\n        \n    - **phone** (string): The phone number of the registered user.\n        \n    - **verification_code** (integer): A code used for verifying the user's phone number.\n        \n    - **status** (integer): The registration status of the user.\n        \n    - **updated_at** (string): Timestamp of when the user data was last updated.\n        \n    - **created_at** (string): Timestamp of when the user was created.\n        \n    - **id** (integer): The unique identifier for the registered user.\n        \n\n#### Notes\n\n- Ensure that the password and password confirmation match to avoid registration errors.\n    \n- The verification code may be required for subsequent actions such as logging in or verifying the account."
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "authentication endpoints"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/categories?limit=-1",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"categories"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "-1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/categories/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"categories",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "30|HMf437Ij5C6tLkQ1d7r3dS7tyNRF7n9hXlOiAgHc01249339",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products?page=3",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "-1",
+									"disabled": true
+								},
+								{
+									"key": "category_id",
+									"value": "2",
+									"description": "exists:categories,id",
+									"disabled": true
+								},
+								{
+									"key": "featured",
+									"value": "true",
+									"description": "boolean",
+									"disabled": true
+								},
+								{
+									"key": "new",
+									"value": "true",
+									"description": "boolean",
+									"disabled": true
+								},
+								{
+									"key": "price_min",
+									"value": "",
+									"description": "numeric",
+									"disabled": true
+								},
+								{
+									"key": "price_max",
+									"value": "",
+									"description": "numeric",
+									"disabled": true
+								},
+								{
+									"key": "attribute_options[1]",
+									"value": "8",
+									"description": "exists:attribute_options,id",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "",
+									"description": "newest | oldest | expensive | cheap | a_to_z | z_to_a",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "125"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "toggle  favorite list",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products/:id/toggle-favorite",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id",
+								"toggle-favorite"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "comment",
+									"value": "Great Product",
+									"type": "text"
+								},
+								{
+									"key": "rating",
+									"value": "5",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/products/:id/review",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								":id",
+								"review"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "13"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "29|XHsX7H8MTfXsK40HBrhRyPbRevTYP3y3p8FTPHJy645ac68c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/products/search?query=aa",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"products",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "aa"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Favorite List",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/favorite-list",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"favorite-list"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "14|fSjtH0d6Y0Alooeso1NtgtdYamycmdJM9ZPioTuY48f7f4d8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/cart",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add to cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "variant_id",
+									"value": "11",
+									"description": "required|exists:pack_sizes,id",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/cart/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"cart",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "125"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update quantity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/cart/:id?quantity=1&pack_size_id=3",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"cart",
+								":id"
+							],
+							"query": [
+								{
+									"key": "quantity",
+									"value": "1"
+								},
+								{
+									"key": "pack_size_id",
+									"value": "3"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove from cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "14|fSjtH0d6Y0Alooeso1NtgtdYamycmdJM9ZPioTuY48f7f4d8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/cart/:id?pack_size_id=2",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"cart",
+								":id"
+							],
+							"query": [
+								{
+									"key": "pack_size_id",
+									"value": "2"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "14"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clear cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/cart",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "apply coupon",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "code",
+									"value": "Hello100",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/cart/apply-coupon",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"cart",
+								"apply-coupon"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Addresses",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/addresses",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Home",
+									"description": "required | string |max:255",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "0123456789",
+									"description": "required | string | max:20",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "3 abbas st.",
+									"description": "required | string | max:500",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Cairo",
+									"description": "required | string | max:100",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Egypt",
+									"description": "required | string | max:100",
+									"type": "text"
+								},
+								{
+									"key": "state",
+									"value": "",
+									"description": "nullable | string | max:100",
+									"type": "text"
+								},
+								{
+									"key": "postal_code",
+									"value": "",
+									"description": "nullable | string | max:20",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/addresses",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "index",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "shipping_address_id",
+									"value": "1",
+									"description": "required | exists:addresses,id",
+									"type": "text"
+								},
+								{
+									"key": "billing_address_id",
+									"value": "1",
+									"description": "required | exists:addresses,id",
+									"type": "text"
+								},
+								{
+									"key": "payment_method",
+									"value": "cash",
+									"description": "required | string",
+									"type": "text"
+								},
+								{
+									"key": "coupon_code",
+									"value": "Hello100",
+									"description": "nullable | string | exists:coupons,code",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/orders",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "shipping_address_id",
+									"value": "1",
+									"description": "required | exists:addresses,id",
+									"type": "text"
+								},
+								{
+									"key": "billing_address_id",
+									"value": "1",
+									"description": "required | exists:addresses,id",
+									"type": "text"
+								},
+								{
+									"key": "payment_method",
+									"value": "cash",
+									"description": "required | string",
+									"type": "text"
+								},
+								{
+									"key": "coupon_code",
+									"value": "Hello100",
+									"description": "nullable | string | exists:coupons,code",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/orders/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"orders",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "shipping_address_id",
+									"value": "1",
+									"description": "required | exists:addresses,id",
+									"type": "text"
+								},
+								{
+									"key": "billing_address_id",
+									"value": "1",
+									"description": "required | exists:addresses,id",
+									"type": "text"
+								},
+								{
+									"key": "payment_method",
+									"value": "cash",
+									"description": "required | string",
+									"type": "text"
+								},
+								{
+									"key": "coupon_code",
+									"value": "Hello100",
+									"description": "nullable | string | exists:coupons,code",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "use_points",
+									"value": "1",
+									"description": "nullable | boolean",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "branch_id",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/orders",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cancel",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "shipping_address_id",
+									"value": "1",
+									"description": "required | exists:addresses,id",
+									"type": "text"
+								},
+								{
+									"key": "billing_address_id",
+									"value": "1",
+									"description": "required | exists:addresses,id",
+									"type": "text"
+								},
+								{
+									"key": "payment_method",
+									"value": "cash",
+									"description": "required | string",
+									"type": "text"
+								},
+								{
+									"key": "coupon_code",
+									"value": "Hello100",
+									"description": "nullable | string | exists:coupons,code",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/orders/:id/cancel",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"orders",
+								":id",
+								"cancel"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base-url}}/transactions",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base-url}}/transactions/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"transactions",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pay",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base-url}}/transactions/:id/pay",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"transactions",
+								":id",
+								"pay"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attributes",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/attributes",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"attributes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tickets",
+			"item": [
+				{
+					"name": "my tickets",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tickets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tickets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "subject",
+									"value": "Test Subject",
+									"description": "required|string|max:255",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": " Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni earum aliquam, quisquam blanditiis iusto nam fuga deserunt quo. Quam nobis excepturi ipsa repellat doloremque illum laboriosam reprehenderit iure quod soluta.",
+									"description": "required|string",
+									"type": "text"
+								},
+								{
+									"key": "attachments[0]",
+									"description": "file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048",
+									"type": "file",
+									"src": "/C:/Users/P M T/Downloads/51dgTQQZq-L._SL500_._AC_SL500_.jpg"
+								},
+								{
+									"key": "attachments[1]",
+									"type": "file",
+									"src": "/C:/Users/P M T/Downloads/licensed-image.jpeg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/tickets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tickets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tickets/:id?subject=Test Subject 2&description= Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni earum aliquam, quisquam blanditiis iusto nam fuga deserunt quo. Quam nobis excepturi ipsa repellat doloremque illum laboriosam reprehenderit iure quod soluta.",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
+							"query": [
+								{
+									"key": "subject",
+									"value": "Test Subject 2",
+									"description": "required|string|max:255"
+								},
+								{
+									"key": "description",
+									"value": " Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni earum aliquam, quisquam blanditiis iusto nam fuga deserunt quo. Quam nobis excepturi ipsa repellat doloremque illum laboriosam reprehenderit iure quod soluta.",
+									"description": "required|string"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tickets/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tickets/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reply",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|eFuV6Yfi47NTE1W18Dcz668WIdf0pRzDxxNZjK2G9807b496",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "message",
+									"value": "tset user reply",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/tickets/:id/reply",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tickets",
+								":id",
+								"reply"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Branches",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "29|XHsX7H8MTfXsK40HBrhRyPbRevTYP3y3p8FTPHJy645ac68c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/branches",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"branches"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Offers",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "29|XHsX7H8MTfXsK40HBrhRyPbRevTYP3y3p8FTPHJy645ac68c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/offers",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"offers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sliders",
+			"item": [
+				{
+					"name": "sliders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "29|XHsX7H8MTfXsK40HBrhRyPbRevTYP3y3p8FTPHJy645ac68c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/sliders",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"sliders"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking Lists",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "31|qXuWpnVeg9FoG6nxQLa7ybpFaNLlGWX8WmqImOj9945c9ac3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/booking-lists",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"booking-lists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "31|qXuWpnVeg9FoG6nxQLa7ybpFaNLlGWX8WmqImOj9945c9ac3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/booking-lists/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"booking-lists",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "31|qXuWpnVeg9FoG6nxQLa7ybpFaNLlGWX8WmqImOj9945c9ac3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "product_id",
+									"value": "124",
+									"description": "required|exists:products,id",
+									"type": "text"
+								},
+								{
+									"key": "quantity",
+									"value": "5",
+									"description": "required|integer|min:1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/booking-lists",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"booking-lists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "31|qXuWpnVeg9FoG6nxQLa7ybpFaNLlGWX8WmqImOj9945c9ac3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/booking-lists/:id?quantity=15&product_id=123",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"booking-lists",
+								":id"
+							],
+							"query": [
+								{
+									"key": "quantity",
+									"value": "15"
+								},
+								{
+									"key": "product_id",
+									"value": "123"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "31|qXuWpnVeg9FoG6nxQLa7ybpFaNLlGWX8WmqImOj9945c9ac3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/booking-lists/:id",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"booking-lists",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cancel",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "31|qXuWpnVeg9FoG6nxQLa7ybpFaNLlGWX8WmqImOj9945c9ac3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/booking-lists/:id/cancel",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"booking-lists",
+								":id",
+								"cancel"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base-url",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "base_url",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

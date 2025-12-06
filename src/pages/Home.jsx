@@ -4,6 +4,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import CategoryCard from "../components/CategoryCard";
 import ProductCard from "../components/ProductCard";
 import HeroSlider from "../components/HeroSlider";
+import OffersSection from "../components/OffersSection";
 import PageLayout from "../components/PageLayout";
 import {
   CategoriesGridSkeleton,
@@ -93,6 +94,10 @@ const Home = () => {
       <div className="w-full">
         {/* Hero Slider Section */}
         <HeroSlider />
+
+        {/* Offers Section */}
+        <OffersSection />
+
         {/* CTA Section - Full Width Edge to Edge */}
         <section
           className={`w-screen flex flex-col items-center justify-center relative left-1/2 -translate-x-1/2 backdrop-blur-md py-24 md:py-28 lg:py-32 border-y-2 shadow-2xl transition-all duration-300 ${
@@ -180,7 +185,6 @@ const Home = () => {
         >
           <div className="w-full max-w-7xl mx-auto">
             <div className="flex  items-center justify-between mb-12 md:mb-16 lg:mb-20">
-             
               <h2
                 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold drop-shadow-lg ${
                   isDark ? "text-white" : "text-luxury-brown-text"
@@ -256,7 +260,6 @@ const Home = () => {
         >
           <div className="w-full max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-12 md:mb-16 lg:mb-20">
-              
               <h2
                 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold drop-shadow-lg ${
                   isDark ? "text-white" : "text-luxury-brown-text"

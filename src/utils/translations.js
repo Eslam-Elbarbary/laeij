@@ -1,6 +1,5 @@
-// Helper function to get translated text from mock data based on current language
+// Helper functions to get translated text based on current language
 import i18n from "../i18n";
-import { mockCategories, mockProducts } from "../services/mockData";
 
 /**
  * Get translated name from product/category object
@@ -11,19 +10,12 @@ export const getTranslatedName = (item) => {
     if (!item) return "";
     const currentLang = i18n.language || "ar";
 
-    // If nameEn exists, use it for English
+    // Use nameEn for English, name for Arabic
     if (currentLang === "en" && item.nameEn) {
         return item.nameEn;
     }
 
-    // If nameEn doesn't exist but we have an ID, try to look up the product
-    if (currentLang === "en" && item.id && !item.nameEn) {
-        const product = mockProducts.find((p) => p.id === parseInt(item.id));
-        if (product && product.nameEn) {
-            return product.nameEn;
-        }
-    }
-
+    // Fallback to name if nameEn doesn't exist
     return item.name || "";
 };
 
@@ -40,12 +32,11 @@ export const getTranslatedDescription = (item) => {
 
 /**
  * Get translated category name
- * @param {string|Object|number} category - Category string, object, or categoryId
- * @param {number} [categoryId] - Optional category ID to look up
+ * @param {string|Object} category - Category string or object with name and nameEn
  * @returns {string} Translated category name
  */
-export const getTranslatedCategory = (category, categoryId = null) => {
-    if (!category && !categoryId) return "";
+export const getTranslatedCategory = (category) => {
+    if (!category) return "";
     const currentLang = i18n.language || "ar";
 
     // If category is an object with name and nameEn
@@ -53,21 +44,7 @@ export const getTranslatedCategory = (category, categoryId = null) => {
         return currentLang === "en" && category.nameEn ? category.nameEn : category.name || "";
     }
 
-    // Look up category by ID or name in mockCategories
-    let categoryObj = null;
-    if (categoryId) {
-        categoryObj = mockCategories.find((cat) => cat.id === parseInt(categoryId));
-    } else if (typeof category === "string") {
-        categoryObj = mockCategories.find((cat) => cat.name === category || cat.nameEn === category);
-    } else if (typeof category === "number") {
-        categoryObj = mockCategories.find((cat) => cat.id === parseInt(category));
-    }
-
-    if (categoryObj) {
-        return currentLang === "en" && categoryObj.nameEn ? categoryObj.nameEn : categoryObj.name;
-    }
-
-    // Fallback: return category as string if not found
+    // Fallback: return category as string
     return typeof category === "string" ? category : "";
 };
 

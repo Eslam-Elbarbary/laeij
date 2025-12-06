@@ -42,7 +42,7 @@ const Login = () => {
     email: "",
     phone: "",
     password: "",
-    confirmPassword: "",
+    password_confirmation: "",
     agreeToTerms: false,
   });
   const [signupErrors, setSignupErrors] = useState({});
@@ -148,10 +148,9 @@ const Login = () => {
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const result = login(loginData.email, loginData.password);
-      setIsLoading(false);
+    try {
+      // Call real API login
+      const result = await login(loginData.email, loginData.password);
 
       if (result.success) {
         // Handle remember me
@@ -160,13 +159,18 @@ const Login = () => {
         } else {
           localStorage.removeItem("rememberedEmail");
         }
-        
-        showToast(t("login.loginSuccess"), "success");
+
+        showToast(result.message || t("login.loginSuccess"), "success");
         setTimeout(() => navigate("/"), 500);
       } else {
         showToast(result.message || t("login.loginFailed"), "error");
       }
-    }, 1000);
+    } catch (error) {
+      console.error("Login error:", error);
+      showToast(t("login.loginFailed"), "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = async (e) => {
@@ -179,39 +183,47 @@ const Login = () => {
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const result = signup({
-        name: signupData.name,
-        email: signupData.email,
-        phone: signupData.phone.replace(/\s/g, ""),
-        password: signupData.password,
-      });
+    // Prepare registration data
+    const registrationData = {
+      name: signupData.name,
+      email: signupData.email,
+      phone: signupData.phone.replace(/\s/g, ""),
+      password: signupData.password,
+      password_confirmation: signupData.password_confirmation,
+    };
 
-      setIsLoading(false);
+    try {
+      // Call real API for registration
+      const result = await signup(registrationData);
 
       if (result.success) {
-        showToast(t("login.accountCreated"), "success");
-        // Clear signup form
-        setSignupData({
-          name: "",
-          email: "",
-          phone: "",
-          password: "",
-          confirmPassword: "",
-          agreeToTerms: false,
-        });
-        setSignupErrors({});
-        // Switch to login tab and pre-fill email
-        setActiveTab("login");
-        setLoginData({
-          email: result.email || signupData.email,
-          password: "",
-        });
+        showToast(result.message || t("login.accountCreated"), "success");
+
+        // Redirect to OTP verification page with email and registration data for resend
+        setTimeout(() => {
+          navigate("/otp-verification", {
+            state: {
+              email: signupData.email,
+              phone: signupData.phone.replace(/\s/g, ""),
+              phoneNumber: signupData.phone,
+              registrationData: registrationData, // Store for resend functionality
+            },
+            replace: true,
+          });
+        }, 1000);
       } else {
+        // Handle validation errors
+        if (result.errors) {
+          setSignupErrors(result.errors);
+        }
         showToast(result.message || t("login.accountFailed"), "error");
+        setIsLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      console.error("Signup error:", error);
+      showToast(t("login.accountFailed"), "error");
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = (e) => {
@@ -233,10 +245,7 @@ const Login = () => {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      showToast(
-        t("login.resetLinkSent"),
-        "success"
-      );
+      showToast(t("login.resetLinkSent"), "success");
       setActiveTab("login");
       setForgotPasswordData({ email: "" });
     }, 1000);
@@ -288,14 +297,30 @@ const Login = () => {
                 <div className="text-8xl xl:text-9xl hidden">🐴</div>
               </div>
             </div>
-            <h1 className={`text-4xl xl:text-5xl font-bold mb-6 drop-shadow-2xl ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+            <h1
+              className={`text-4xl xl:text-5xl font-bold mb-6 drop-shadow-2xl ${
+                i18n.language === "ar" ? "text-right" : "text-left"
+              }`}
+            >
               {t("login.welcomeToLaeij")}
             </h1>
-            <p className={`text-xl xl:text-2xl opacity-90 leading-relaxed drop-shadow-lg mb-8 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+            <p
+              className={`text-xl xl:text-2xl opacity-90 leading-relaxed drop-shadow-lg mb-8 ${
+                i18n.language === "ar" ? "text-right" : "text-left"
+              }`}
+            >
               {t("login.discoverWorld")}
             </p>
-            <div className={`flex flex-col gap-4 text-lg opacity-80 ${i18n.language === "ar" ? "items-end" : "items-start"}`}>
-              <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+            <div
+              className={`flex flex-col gap-4 text-lg opacity-80 ${
+                i18n.language === "ar" ? "items-end" : "items-start"
+              }`}
+            >
+              <div
+                className={`flex items-center gap-3 ${
+                  i18n.language === "ar" ? "flex-row-reverse" : ""
+                }`}
+              >
                 <svg
                   className="w-6 h-6 text-luxury-gold-light flex-shrink-0"
                   fill="none"
@@ -311,7 +336,11 @@ const Login = () => {
                 </svg>
                 <span>{t("login.exclusivePerfumes")}</span>
               </div>
-              <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+              <div
+                className={`flex items-center gap-3 ${
+                  i18n.language === "ar" ? "flex-row-reverse" : ""
+                }`}
+              >
                 <svg
                   className="w-6 h-6 text-luxury-gold-light flex-shrink-0"
                   fill="none"
@@ -327,7 +356,11 @@ const Login = () => {
                 </svg>
                 <span>{t("login.naturalOils")}</span>
               </div>
-              <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+              <div
+                className={`flex items-center gap-3 ${
+                  i18n.language === "ar" ? "flex-row-reverse" : ""
+                }`}
+              >
                 <svg
                   className="w-6 h-6 text-luxury-gold-light flex-shrink-0"
                   fill="none"
@@ -376,7 +409,11 @@ const Login = () => {
           </div>
 
           {/* Welcome Text */}
-          <div className={`mb-8 lg:mb-10 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+          <div
+            className={`mb-8 lg:mb-10 ${
+              i18n.language === "ar" ? "text-right" : "text-left"
+            }`}
+          >
             <h2
               className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${
                 isDark ? "text-white" : "text-luxury-brown-text"
@@ -398,7 +435,11 @@ const Login = () => {
           </div>
 
           {/* Tabs */}
-          <div className={`flex gap-2 mb-8 bg-card-muted p-1.5 rounded-2xl border-2 border-card ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+          <div
+            className={`flex gap-2 mb-8 bg-card-muted p-1.5 rounded-2xl border-2 border-card ${
+              i18n.language === "ar" ? "flex-row-reverse" : ""
+            }`}
+          >
             <button
               onClick={() => setActiveTab("login")}
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${
@@ -477,14 +518,22 @@ const Login = () => {
                   } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 />
                 {loginErrors.email && (
-                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <p
+                    className={`text-red-500 text-sm mt-2 ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {loginErrors.email}
                   </p>
                 )}
               </div>
 
               <div>
-                <div className={`flex items-center justify-between mb-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center justify-between mb-3 ${
+                    i18n.language === "ar" ? "flex-row-reverse" : ""
+                  }`}
+                >
                   <label
                     className={`block text-base md:text-lg font-semibold ${
                       isDark
@@ -534,13 +583,21 @@ const Login = () => {
                   } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 />
                 {loginErrors.password && (
-                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <p
+                    className={`text-red-500 text-sm mt-2 ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {loginErrors.password}
                   </p>
                 )}
               </div>
 
-              <div className={`flex items-center gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+              <div
+                className={`flex items-center gap-3 ${
+                  i18n.language === "ar" ? "flex-row-reverse" : ""
+                }`}
+              >
                 <input
                   type="checkbox"
                   id="remember"
@@ -618,7 +675,11 @@ const Login = () => {
                   } ${i18n.language === "ar" ? "text-right" : "text-left"}`}
                 />
                 {signupErrors.name && (
-                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <p
+                    className={`text-red-500 text-sm mt-2 ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {signupErrors.name}
                   </p>
                 )}
@@ -662,7 +723,11 @@ const Login = () => {
                   }`}
                 />
                 {signupErrors.email && (
-                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <p
+                    className={`text-red-500 text-sm mt-2 ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {signupErrors.email}
                   </p>
                 )}
@@ -729,7 +794,11 @@ const Login = () => {
                   />
                 </div>
                 {signupErrors.phone && (
-                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <p
+                    className={`text-red-500 text-sm mt-2 ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {signupErrors.phone}
                   </p>
                 )}
@@ -790,7 +859,11 @@ const Login = () => {
                   }`}
                 />
                 {signupErrors.password ? (
-                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <p
+                    className={`text-red-500 text-sm mt-2 ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {signupErrors.password}
                   </p>
                 ) : (
@@ -860,13 +933,21 @@ const Login = () => {
                   }`}
                 />
                 {signupErrors.confirmPassword && (
-                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <p
+                    className={`text-red-500 text-sm mt-2 ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {signupErrors.confirmPassword}
                   </p>
                 )}
               </div>
 
-              <div className={`flex items-start gap-3 ${i18n.language === "ar" ? "flex-row-reverse" : ""}`}>
+              <div
+                className={`flex items-start gap-3 ${
+                  i18n.language === "ar" ? "flex-row-reverse" : ""
+                }`}
+              >
                 <input
                   type="checkbox"
                   id="agree"
@@ -906,7 +987,11 @@ const Login = () => {
                 </label>
               </div>
               {signupErrors.agreeToTerms && (
-                <p className={`text-red-500 text-sm -mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                <p
+                  className={`text-red-500 text-sm -mt-2 ${
+                    i18n.language === "ar" ? "text-right" : "text-left"
+                  }`}
+                >
                   {signupErrors.agreeToTerms}
                 </p>
               )}
@@ -967,7 +1052,11 @@ const Login = () => {
                   }`}
                 />
                 {forgotPasswordError ? (
-                  <p className={`text-red-500 text-sm mt-2 ${i18n.language === "ar" ? "text-right" : "text-left"}`}>
+                  <p
+                    className={`text-red-500 text-sm mt-2 ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {forgotPasswordError}
                   </p>
                 ) : (

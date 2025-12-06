@@ -19,6 +19,7 @@ const Categories = () => {
         setLoading(true);
         setError(null);
         const response = await apiService.getCategories();
+        console.log(response.data);
         if (response.success) {
           setCategories(response.data);
         } else {
@@ -100,7 +101,7 @@ const Categories = () => {
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold text-white mb-6 md:mb-8 drop-shadow-2xl animate-fade-in">
                 {t("categories.allCategories")}
               </h1>
-              <p className="text-gray-200 text-lg md:text-xl lg:text-2xl xl:text-3xl max-w-3xl mx-auto drop-shadow-lg animate-fade-in">
+              <p className="text-gray-200 text-lg md:text-xl lg:text-2xl xl:text-3xl max-w-3xl mx-auto drop-shadow-lg animate-fade-in" >
                 {t("categories.subtitle")}
               </p>
             </div>

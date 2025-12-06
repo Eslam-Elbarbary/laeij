@@ -9,6 +9,7 @@ import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
+import CreateBookingListModal from "../components/CreateBookingListModal";
 import {
   getTranslatedName,
   getTranslatedDescription,
@@ -27,34 +28,56 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedSize, setSelectedSize] = useState("12 g");
+  const [selectedPackSize, setSelectedPackSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        setError(null);
         const response = await apiService.getProductById(id);
+
         if (response.success && response.data) {
-          setProduct(response.data);
-          setSelectedSize(response.data.size || "12 g");
-        } else {
-          setError(response.message || t("productDetail.notFound"));
+          const productData = response.data;
+
+          // نضمن إن pack_sizes دايمًا array
+          if (
+            !productData.pack_sizes ||
+            !Array.isArray(productData.pack_sizes)
+          ) {
+            productData.pack_sizes = [];
+          }
+
+          // === الحل السحري: لو مفيش pack_sizes → نعمل واحد وهمي من الـ size العادي ===
+          if (productData.pack_sizes.length === 0) {
+            const fallbackSize = productData.size || "30 جم";
+            const fallbackId =
+              productData.default_pack_size_id || productData.id || 1;
+
+            productData.pack_sizes = [
+              {
+                id: fallbackId,
+                size: fallbackSize,
+                price: productData.price,
+              },
+            ];
+          }
+
+          setProduct(productData);
+          setSelectedPackSize(productData.pack_sizes[0]); // نختار الأول (سواء حقيقي أو وهمي)
         }
       } catch (err) {
+        console.error(err);
         setError(t("productDetail.errorLoading"));
-        console.error("Error fetching product:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchProduct();
-    }
-  }, [id]);
+    if (id) fetchProduct();
+  }, [id, t]);
 
   // Format price helper
   const formatPrice = (price) => {
@@ -64,13 +87,7 @@ const ProductDetail = () => {
     return price;
   };
 
-  const currentPrice = product ? product.price : 0;
-
-  const sizes = product?.size ? [product.size] : ["30 جم", "50 جم", "100 جم"];
-
-  const handleSizeChange = (size) => {
-    setSelectedSize(size);
-  };
+  const currentPrice = selectedPackSize?.price || product?.price || 0;
 
   const skeletonBg = isDark
     ? "bg-luxury-brown-darker/60"
@@ -136,14 +153,18 @@ const ProductDetail = () => {
             >
               <img
                 src={
+                  product.thumb_image ||
                   product.image ||
-                  "https://via.placeholder.com/600x600/92400e/ffffff?text=Product"
+                  product.images?.[0] ||
+                  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect fill='%2392400e' width='600' height='600'/%3E%3Ctext fill='%23ffffff' font-family='sans-serif' font-size='36' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EProduct%3C/text%3E%3C/svg%3E"
                 }
                 alt={product.name}
                 className="absolute inset-0 w-full h-full object-cover object-center"
                 onError={(e) => {
+                  // Use data URI as fallback to avoid network requests
                   e.target.src =
-                    "https://via.placeholder.com/600x600/92400e/ffffff?text=Product";
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect fill='%2392400e' width='600' height='600'/%3E%3Ctext fill='%23ffffff' font-family='sans-serif' font-size='36' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EProduct%3C/text%3E%3C/svg%3E";
+                  e.target.onerror = null; // Prevent infinite loop
                 }}
               />
             </div>
@@ -229,26 +250,31 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Size Selection */}
+            {/* Size Selection - مضمون 100% يظهر حجم */}
             <div>
               <label className="block text-primary text-lg font-semibold mb-4">
                 {t("productDetail.size")}:
               </label>
               <div className="flex ltr gap-3 flex-wrap">
-                {sizes.map((size) => (
+                {product?.pack_sizes?.map((pack) => (
                   <button
-                    key={size}
-                    onClick={() => handleSizeChange(size)}
-                    className={`px-6 py-3 rounded-xl transition-all font-medium ${
-                      selectedSize === size
-                        ? "bg-luxury-gold/15 border border-luxury-gold text-luxury-gold shadow-lg"
+                    key={pack.id}
+                    onClick={() => setSelectedPackSize(pack)}
+                    className={`px-6 py-3 rounded-xl transition-all font-medium border-2 ${
+                      selectedPackSize?.id === pack.id
+                        ? "bg-luxury-gold/15 border-luxury-gold text-luxury-gold shadow-lg"
                         : unselectedSizeClasses
                     }`}
                   >
-                    {size}
+                    {pack.size}
                   </button>
                 ))}
               </div>
+
+              <p className="mt-2 text-sm text-muted">
+                {t("productDetail.selectedSize")}:{" "}
+                <strong>{selectedPackSize?.size || "جاري التحميل..."}</strong>
+              </p>
             </div>
 
             {/* Quantity */}
@@ -290,6 +316,7 @@ const ProductDetail = () => {
               </h3>
               <p className="leading-relaxed text-secondary">
                 {getTranslatedDescription(product)}
+                {}
               </p>
             </div>
 
@@ -379,16 +406,22 @@ const ProductDetail = () => {
                     return;
                   }
 
-                  if (product) {
-                    addToCart({ ...product, quantity, selectedSize });
-                    showToast(
-                      t("productDetail.addedToCart", {
-                        name: getTranslatedName(product),
-                      }),
-                      "success"
-                    );
-                    setTimeout(() => navigate("/cart"), 500);
+                  if (!selectedPackSize) {
+                    showToast(t("productDetail.selectSize"), "error");
+                    return;
                   }
+
+                  addToCart(product, quantity, selectedPackSize.id); // هنا المفتاح: pack_size.id
+
+                  showToast(
+                    t("productDetail.addedToCart", {
+                      name: getTranslatedName(product),
+                      size: selectedPackSize.size,
+                    }),
+                    "success"
+                  );
+
+                  setTimeout(() => navigate("/cart"), 600);
                 }}
                 className="flex-[2] min-w-[280px] bg-gradient-to-r from-amber-600 to-amber-800 text-white py-5 rounded-xl font-semibold text-xl hover:from-amber-700 hover:to-amber-900 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-luxury-gold/60"
               >
@@ -398,10 +431,57 @@ const ProductDetail = () => {
                   )}`,
                 })}
               </button>
+              <button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    showToast(t("productDetail.pleaseLoginCart"), "error");
+                    navigate("/login");
+                    return;
+                  }
+                  setShowBookingModal(true);
+                }}
+                className={`flex-1 min-w-[200px] max-w-[250px] py-5 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-luxury-gold/60 flex items-center justify-center gap-3 ${
+                  isDark
+                    ? "bg-luxury-brown-darker/90 text-luxury-brown-light hover:bg-luxury-brown-darker border-2 border-luxury-gold-dark/40"
+                    : "bg-luxury-cream/80 text-luxury-brown-text hover:bg-luxury-cream border-2 border-luxury-gold-light/50"
+                }`}
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                  />
+                </svg>
+                <span>
+                  {t("productDetail.addToBookingList") || "Add to Booking List"}
+                </span>
+              </button>
             </div>
           </div>
         </div>
       </div>
+      {showBookingModal && product && (
+        <CreateBookingListModal
+          onClose={() => setShowBookingModal(false)}
+          onSuccess={() => {
+            setShowBookingModal(false);
+            showToast(
+              t("bookingLists.createSuccess") ||
+                "Added to booking list successfully",
+              "success"
+            );
+          }}
+          productId={product.id}
+          initialQuantity={quantity}
+        />
+      )}
     </PageLayout>
   );
 };

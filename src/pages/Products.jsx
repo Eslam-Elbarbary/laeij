@@ -11,14 +11,14 @@ import i18n from "../i18n";
 const Products = () => {
   const { t } = useTranslation();
   const { isDark } = useTheme();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const categoryId = searchParams.get("category") || null;
   const initialSearch = searchParams.get("search") || "";
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [selectedFilter, setSelectedFilter] = useState(categoryId || "all");
   const [sortBy, setSortBy] = useState("price-low");
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,15 +39,19 @@ const Products = () => {
   const [minRating, setMinRating] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);
 
-  const filters = [
-    { value: "all", label: t("products.all") },
-    { value: "بخاخات السيارات", label: t("products.filters.carSprays") },
-    { value: "عطور حصرية", label: t("products.filters.exclusivePerfumes") },
-    { value: "تركيبات مميزة", label: t("products.filters.specialBlends") },
-    { value: "بخاخات تجميل", label: t("products.filters.cosmeticSprays") },
-    { value: "أخرى", label: t("products.filters.other") },
-    { value: "عطور كلاسيكية", label: t("products.filters.classicPerfumes") },
-  ];
+  // Categories for mapping filter buttons to category IDs
+  const [categories, setCategories] = useState([]);
+
+  // Build filters array - will include "all", "featured", "new", and categories
+  const [filters, setFilters] = useState([
+    { value: "all", label: t("products.all"), categoryId: null },
+    {
+      value: "featured",
+      label: t("products.featured") || "Featured",
+      categoryId: null,
+    },
+    { value: "new", label: t("products.new") || "New", categoryId: null },
+  ]);
 
   const brandKeys = [
     "laeij",
@@ -90,6 +94,60 @@ const Products = () => {
     return price;
   };
 
+  // Fetch categories and populate filters
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await apiService.getCategories(-1);
+        if (response.success && response.data) {
+          setCategories(response.data);
+          // Build filters array from categories
+          const categoryFilters = response.data.map((category) => ({
+            value: category.id?.toString() || category.id,
+            label:
+              i18n.language === "en" && category.name_en
+                ? category.name_en
+                : category.name,
+            categoryId: category.id,
+          }));
+          setFilters([
+            { value: "all", label: t("products.all"), categoryId: null },
+            {
+              value: "featured",
+              label: t("products.featured") || "Featured",
+              categoryId: null,
+            },
+            {
+              value: "new",
+              label: t("products.new") || "New",
+              categoryId: null,
+            },
+            ...categoryFilters,
+          ]);
+        }
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+
+    fetchCategories();
+  }, [t, i18n.language]);
+
+  // Sync selectedFilter with URL categoryId
+  useEffect(() => {
+    if (categoryId) {
+      setSelectedFilter(categoryId);
+    } else if (
+      !categoryId &&
+      selectedFilter !== "all" &&
+      selectedFilter !== "featured" &&
+      selectedFilter !== "new"
+    ) {
+      // Reset to "all" if URL categoryId is cleared
+      setSelectedFilter("all");
+    }
+  }, [categoryId]);
+
   // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
@@ -97,21 +155,89 @@ const Products = () => {
         setLoading(true);
         setError(null);
 
+        // Build filters object with correct parameter names for API
         const filters = {
-          sortBy: sortBy,
           limit: 9,
           page: currentPage,
         };
 
-        // Add category filter
-        if (categoryId && categoryId !== "all") {
-          filters.categoryId = categoryId;
+        // Map sortBy to API's expected 'sort' parameter
+        // Convert frontend sort values to API format
+        const sortMap = {
+          "price-low": "cheap",
+          "price-high": "expensive",
+          newest: "newest",
+          oldest: "oldest",
+          popular: "a_to_z",
+          rating: "a_to_z",
+        };
+        if (sortBy && sortMap[sortBy]) {
+          filters.sort = sortMap[sortBy];
         }
 
-        // Add tag filter
-        if (selectedFilter && selectedFilter !== "all") {
-          filters.tag = selectedFilter;
+        // Add category filter (API expects 'category_id')
+        // Priority: URL categoryId > selectedFilter category
+        if (categoryId && categoryId !== "all") {
+          filters.category_id = parseInt(categoryId, 10);
+        } else if (
+          selectedFilter &&
+          selectedFilter !== "all" &&
+          selectedFilter !== "featured" &&
+          selectedFilter !== "new"
+        ) {
+          // Check if selectedFilter is a category ID
+          const selectedCategoryId = parseInt(selectedFilter, 10);
+          if (!isNaN(selectedCategoryId)) {
+            filters.category_id = selectedCategoryId;
+          }
         }
+
+        // Add Featured filter (API expects boolean string "true" or "false")
+        if (selectedFilter === "featured") {
+          filters.featured = "true";
+        }
+
+        // Add New filter (API expects boolean string "true" or "false")
+        if (selectedFilter === "new") {
+          filters.new = "true";
+        }
+
+        // Add price range filters (API expects numeric values)
+        if (priceRange[0] > 0) {
+          filters.price_min = priceRange[0];
+        }
+        if (priceRange[1] < 5000) {
+          filters.price_max = priceRange[1];
+        }
+
+        // Add attribute_options for brands and sizes
+        // API format: attribute_options[1]=8, attribute_options[2]=9, etc.
+        // Note: This requires mapping brand/size names to attribute_option IDs
+        // For now, we'll create the structure - actual IDs should come from backend
+        const attributeOptions = [];
+
+        // TODO: Map selectedBrands to attribute_option IDs
+        // Example: if brand "Dolce & Gabbana" maps to attribute_option ID 8
+        // if (selectedBrands.length > 0) {
+        //   selectedBrands.forEach((brand, index) => {
+        //     const optionId = getBrandAttributeOptionId(brand);
+        //     if (optionId) attributeOptions.push(optionId);
+        //   });
+        // }
+
+        // TODO: Map selectedSizes to attribute_option IDs
+        // Example: if size "30 جم" maps to attribute_option ID 5
+        // if (selectedSizes.length > 0) {
+        //   selectedSizes.forEach((size, index) => {
+        //     const optionId = getSizeAttributeOptionId(size);
+        //     if (optionId) attributeOptions.push(optionId);
+        //   });
+        // }
+
+        // Add attribute_options to filters
+        attributeOptions.forEach((optionId, index) => {
+          filters[`attribute_options[${index + 1}]`] = optionId;
+        });
 
         // Add search query
         if (searchQuery.trim()) {
@@ -121,8 +247,13 @@ const Products = () => {
         const response = await apiService.getProducts(filters);
 
         if (response.success) {
+          // Ensure response.data is an array
+          const productsData = Array.isArray(response.data)
+            ? response.data
+            : response.data?.data || response.data?.products || [];
+
           // Format products for display
-          const formattedProducts = response.data.map((product) => ({
+          const formattedProducts = productsData.map((product) => ({
             ...product,
             price: formatPrice(product.price),
           }));
@@ -130,26 +261,79 @@ const Products = () => {
 
           // Update pagination info
           if (response.pagination) {
-            setPagination(response.pagination);
+            setPagination({
+              page:
+                response.pagination.current_page ||
+                response.pagination.page ||
+                currentPage,
+              limit:
+                response.pagination.per_page || response.pagination.limit || 9,
+              total: response.pagination.total || 0,
+              totalPages:
+                response.pagination.last_page ||
+                response.pagination.total_pages ||
+                1,
+            });
           }
         } else {
-          setError(response.message);
+          setError(response.message || t("products.errorLoading"));
         }
       } catch (err) {
-        setError(t("products.errorLoading"));
-        console.error("Error fetching products:", err);
+        // More detailed error handling
+        let errorMessage = t("products.errorLoading");
+
+        if (err.response) {
+          // Server responded with error status
+          errorMessage =
+            err.response.data?.message ||
+            `Server error: ${err.response.status}`;
+        } else if (err.request) {
+          // Request made but no response (network error, CORS, etc.)
+          errorMessage =
+            "Network error: Unable to reach the server. Please check your connection and API configuration.";
+        } else {
+          // Something else happened
+          errorMessage = err.message || errorMessage;
+        }
+
+        setError(errorMessage);
+        console.error("Error fetching products:", {
+          error: err,
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status,
+          config: err.config,
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [categoryId, selectedFilter, sortBy, searchQuery, currentPage]);
+  }, [
+    categoryId,
+    selectedFilter,
+    sortBy,
+    searchQuery,
+    currentPage,
+    priceRange,
+    selectedBrands,
+    selectedSizes,
+    t,
+  ]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [categoryId, selectedFilter, sortBy, searchQuery]);
+  }, [
+    categoryId,
+    selectedFilter,
+    sortBy,
+    searchQuery,
+    priceRange,
+    selectedBrands,
+    selectedSizes,
+  ]);
 
   // Scroll to top when page changes
   useEffect(() => {
@@ -251,9 +435,27 @@ const Products = () => {
               {filters.map((filter) => (
                 <button
                   key={filter.value}
-                  onClick={() => setSelectedFilter(filter.value)}
+                  onClick={() => {
+                    setSelectedFilter(filter.value);
+                    // Update URL based on filter selection
+                    const newSearchParams = new URLSearchParams(searchParams);
+                    if (
+                      filter.value === "all" ||
+                      filter.value === "featured" ||
+                      filter.value === "new"
+                    ) {
+                      newSearchParams.delete("category");
+                    } else if (filter.categoryId) {
+                      newSearchParams.set(
+                        "category",
+                        filter.categoryId.toString()
+                      );
+                    }
+                    setSearchParams(newSearchParams, { replace: true });
+                  }}
                   className={`shrink-0 min-w-fit px-6 md:px-8 lg:px-10 py-3 md:py-4 rounded-lg whitespace-nowrap transition-all duration-200 text-sm md:text-base font-medium snap-start ${
-                    selectedFilter === filter.value
+                    selectedFilter === filter.value ||
+                    (filter.value !== "all" && categoryId === filter.value)
                       ? isDark
                         ? "bg-transparent text-white border-[3px] border-white shadow-md"
                         : "bg-transparent text-luxury-brown-darker border-[3px] border-luxury-brown-darker shadow-md"
@@ -543,7 +745,7 @@ const Products = () => {
                   </div>
 
                   {/* Brands */}
-                  <div>
+                  <div className="pt-2 pb-4 border-b border-luxury-gold-dark/20">
                     <label className="block text-base md:text-lg font-semibold text-primary mb-4">
                       {t("products.brand")}
                     </label>
@@ -579,7 +781,7 @@ const Products = () => {
                   </div>
 
                   {/* Sizes */}
-                  <div>
+                  <div className="pt-2">
                     <label className="block text-base md:text-lg font-semibold text-primary mb-4">
                       {t("products.size")}
                     </label>
@@ -933,12 +1135,57 @@ const Products = () => {
                 {loading ? (
                   <ProductsGridSkeleton count={8} />
                 ) : error ? (
-                  <div
-                    className={`text-center py-12 ${
-                      isDark ? "text-red-400" : "text-red-600"
-                    }`}
-                  >
-                    <p className="text-lg">{error}</p>
+                  <div className="text-center py-12">
+                    <div
+                      className={`inline-block p-6 md:p-8 rounded-2xl ${
+                        isDark
+                          ? "bg-red-900/20 border-2 border-red-500/50"
+                          : "bg-red-50 border-2 border-red-300"
+                      }`}
+                    >
+                      <svg
+                        className={`w-16 h-16 mx-auto mb-4 ${
+                          isDark ? "text-red-400" : "text-red-600"
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <p
+                        className={`text-lg md:text-xl font-semibold mb-2 ${
+                          isDark ? "text-red-400" : "text-red-600"
+                        }`}
+                      >
+                        {t("products.errorLoading")}
+                      </p>
+                      <p
+                        className={`text-sm md:text-base mb-4 ${
+                          isDark ? "text-red-300" : "text-red-700"
+                        }`}
+                      >
+                        {error}
+                      </p>
+                      <button
+                        onClick={() => {
+                          setError(null);
+                          window.location.reload();
+                        }}
+                        className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                          isDark
+                            ? "bg-red-600 hover:bg-red-500 text-white"
+                            : "bg-red-600 hover:bg-red-700 text-white"
+                        }`}
+                      >
+                        {t("common.retry")}
+                      </button>
+                    </div>
                   </div>
                 ) : products.length === 0 ? (
                   <div className="text-center py-12">

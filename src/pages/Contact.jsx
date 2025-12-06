@@ -1,14 +1,21 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import { useTheme } from "../contexts/ThemeContext";
 import { useToast } from "../contexts/ToastContext";
+import { useAuth } from "../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
+import apiService from "../services/api";
+import CreateTicketModal from "../components/CreateTicketModal";
 
 const Contact = () => {
   const { isDark } = useTheme();
   const { showToast } = useToast();
+  const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,14 +26,31 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    // Simulate API call
+    // If authenticated, redirect to create ticket
+    if (isAuthenticated) {
+      setShowCreateModal(true);
+      return;
+    }
+
+    // For non-authenticated users, show message to login
+    setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
-      showToast(t("contact.sent"), "success");
-      setFormData({ name: "", email: "", phone: "", message: "" });
-    }, 1500);
+      showToast(
+        t("contact.pleaseLogin") || "Please login to create a support ticket",
+        "info"
+      );
+      navigate("/login");
+    }, 500);
+  };
+
+  const handleTicketCreated = () => {
+    setShowCreateModal(false);
+    showToast(
+      t("contact.ticketCreated") || "Support ticket created successfully!",
+      "success"
+    );
   };
 
   const handleChange = (e) => {
@@ -41,7 +65,11 @@ const Contact = () => {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 lg:py-20">
         <div className="space-y-8 md:space-y-12">
           {/* Header Section */}
-          <div className={`text-center ${i18n.language === "ar" ? "md:text-right" : "md:text-left"} mb-8 md:mb-12`}>
+          <div
+            className={`text-center ${
+              i18n.language === "ar" ? "md:text-right" : "md:text-left"
+            } mb-8 md:mb-12`}
+          >
             <h1
               className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 ${
                 isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
@@ -177,125 +205,172 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* Contact Form */}
+          {/* Contact Form / Create Ticket */}
           <div className="space-y-4 md:space-y-6 mb-8 md:mb-12">
-            <h2
-              className={`text-2xl md:text-3xl font-bold text-center ${i18n.language === "ar" ? "md:text-right" : "md:text-left"} ${
-                isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
-              }`}
-            >
-              {t("contact.sendUsMessage")}
-            </h2>
-            <form
-              onSubmit={handleSubmit}
-              className={`backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 shadow-lg ${
-                isDark
-                  ? "bg-luxury-brown-darker/90 border-luxury-gold-dark/20"
-                  : "bg-luxury-cream/95 border-luxury-gold-light/40"
-              }`}
-            >
-              <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
-                <div>
-                  <label
-                    className={`block text-base md:text-lg font-semibold mb-2 ${
-                      isDark
-                        ? "text-luxury-brown-light"
-                        : "text-luxury-brown-text"
-                    }`}
-                  >
-                    {t("contact.name")}
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
-                    placeholder={t("contact.namePlaceholder")}
-                  />
-                </div>
-                <div>
-                  <label
-                    className={`block text-base md:text-lg font-semibold mb-2 ${
-                      isDark
-                        ? "text-luxury-brown-light"
-                        : "text-luxury-brown-text"
-                    }`}
-                  >
-                    {t("contact.email")}
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
-                    placeholder={t("contact.emailPlaceholder")}
-                  />
-                </div>
-              </div>
-              <div className="mb-4 md:mb-6">
-                <label
-                  className={`block text-base md:text-lg font-semibold mb-2 ${
+            <div className="flex items-center justify-between mb-4">
+              <h2
+                className={`text-2xl md:text-3xl font-bold ${
+                  i18n.language === "ar" ? "md:text-right" : "md:text-left"
+                } ${isDark ? "text-luxury-gold" : "text-luxury-brown-dark"}`}
+              >
+                {t("contact.sendUsMessage")}
+              </h2>
+              {isAuthenticated && (
+                <Link
+                  to="/tickets"
+                  className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 ${
                     isDark
-                      ? "text-luxury-brown-light"
-                      : "text-luxury-brown-text"
-                  }`}
+                      ? "bg-luxury-gold-dark/20 hover:bg-luxury-gold-dark/30 text-luxury-gold-light border border-luxury-gold-dark/40"
+                      : "bg-luxury-gold/10 hover:bg-luxury-gold/20 text-luxury-gold border border-luxury-gold-light/40"
+                  } hover:scale-105 transform`}
                 >
-                  {t("contact.phone")}
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
-                  placeholder={t("contact.phonePlaceholder")}
-                />
-              </div>
-              <div className="mb-6 md:mb-8">
-                <label
-                  className={`block text-base md:text-lg font-semibold mb-2 ${
-                    isDark
-                      ? "text-luxury-brown-light"
-                      : "text-luxury-brown-text"
-                  }`}
-                >
-                  {t("contact.message")}
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={6}
-                  className={`w-full px-4 py-3 rounded-xl resize-none ${inputClasses}`}
-                  placeholder={t("contact.messagePlaceholder")}
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-2xl hover:shadow-luxury-gold-dark/40 hover:scale-[1.02] transform duration-300 focus:outline-none focus:ring-4 focus:ring-luxury-gold/30 border-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  {t("contact.viewTickets") || "View My Tickets"} →
+                </Link>
+              )}
+            </div>
+            {isAuthenticated ? (
+              <div
+                className={`backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 shadow-lg ${
                   isDark
-                    ? "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold hover:from-luxury-gold-light hover:via-luxury-gold hover:to-luxury-gold-light text-luxury-brown-darker border-luxury-gold-dark shadow-luxury-gold-dark/50"
-                    : "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold hover:from-luxury-gold-light hover:via-luxury-gold hover:to-luxury-gold-light text-luxury-brown-darker border-luxury-gold-dark shadow-luxury-gold-dark/30"
+                    ? "bg-luxury-brown-darker/90 border-luxury-gold-dark/20"
+                    : "bg-luxury-cream/95 border-luxury-gold-light/40"
                 }`}
               >
-                {isSubmitting ? t("contact.sending") : t("contact.sendMessage")}
-              </button>
-            </form>
+                <p
+                  className={`text-center mb-6 ${
+                    isDark
+                      ? "text-luxury-brown-light"
+                      : "text-luxury-brown-text"
+                  }`}
+                >
+                  {t("contact.createTicketMessage") ||
+                    "Click the button below to create a support ticket"}
+                </p>
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-2xl hover:shadow-luxury-gold-dark/40 hover:scale-[1.02] transform duration-300 focus:outline-none focus:ring-4 focus:ring-luxury-gold/30 border-2 ${
+                    isDark
+                      ? "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold hover:from-luxury-gold-light hover:via-luxury-gold hover:to-luxury-gold-light text-luxury-brown-darker border-luxury-gold-dark shadow-luxury-gold-dark/50"
+                      : "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold hover:from-luxury-gold-light hover:via-luxury-gold hover:to-luxury-gold-light text-luxury-brown-darker border-luxury-gold-dark shadow-luxury-gold-dark/30"
+                  }`}
+                >
+                  {t("contact.createTicket") || "Create Support Ticket"}
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className={`backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 shadow-lg ${
+                  isDark
+                    ? "bg-luxury-brown-darker/90 border-luxury-gold-dark/20"
+                    : "bg-luxury-cream/95 border-luxury-gold-light/40"
+                }`}
+              >
+                <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+                  <div>
+                    <label
+                      className={`block text-base md:text-lg font-semibold mb-2 ${
+                        isDark
+                          ? "text-luxury-brown-light"
+                          : "text-luxury-brown-text"
+                      }`}
+                    >
+                      {t("contact.name")}
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
+                      placeholder={t("contact.namePlaceholder")}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      className={`block text-base md:text-lg font-semibold mb-2 ${
+                        isDark
+                          ? "text-luxury-brown-light"
+                          : "text-luxury-brown-text"
+                      }`}
+                    >
+                      {t("contact.email")}
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
+                      placeholder={t("contact.emailPlaceholder")}
+                    />
+                  </div>
+                </div>
+                <div className="mb-4 md:mb-6">
+                  <label
+                    className={`block text-base md:text-lg font-semibold mb-2 ${
+                      isDark
+                        ? "text-luxury-brown-light"
+                        : "text-luxury-brown-text"
+                    }`}
+                  >
+                    {t("contact.phone")}
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-xl ${inputClasses}`}
+                    placeholder={t("contact.phonePlaceholder")}
+                  />
+                </div>
+                <div className="mb-6 md:mb-8">
+                  <label
+                    className={`block text-base md:text-lg font-semibold mb-2 ${
+                      isDark
+                        ? "text-luxury-brown-light"
+                        : "text-luxury-brown-text"
+                    }`}
+                  >
+                    {t("contact.message")}
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    rows={6}
+                    className={`w-full px-4 py-3 rounded-xl resize-none ${inputClasses}`}
+                    placeholder={t("contact.messagePlaceholder")}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-2xl hover:shadow-luxury-gold-dark/40 hover:scale-[1.02] transform duration-300 focus:outline-none focus:ring-4 focus:ring-luxury-gold/30 border-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isDark
+                      ? "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold hover:from-luxury-gold-light hover:via-luxury-gold hover:to-luxury-gold-light text-luxury-brown-darker border-luxury-gold-dark shadow-luxury-gold-dark/50"
+                      : "bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold hover:from-luxury-gold-light hover:via-luxury-gold hover:to-luxury-gold-light text-luxury-brown-darker border-luxury-gold-dark shadow-luxury-gold-dark/30"
+                  }`}
+                >
+                  {isSubmitting
+                    ? t("contact.sending")
+                    : t("contact.sendMessage")}
+                </button>
+              </form>
+            )}
           </div>
 
           {/* Map Section */}
           <div className="space-y-4 md:space-y-6">
             <h2
-              className={`text-2xl md:text-3xl font-bold text-center ${i18n.language === "ar" ? "md:text-right" : "md:text-left"} ${
-                isDark ? "text-luxury-gold" : "text-luxury-brown-dark"
-              }`}
+              className={`text-2xl md:text-3xl font-bold text-center ${
+                i18n.language === "ar" ? "md:text-right" : "md:text-left"
+              } ${isDark ? "text-luxury-gold" : "text-luxury-brown-dark"}`}
             >
               {t("contact.mapTitle")}
             </h2>

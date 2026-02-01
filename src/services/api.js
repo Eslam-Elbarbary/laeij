@@ -509,6 +509,7 @@ export const apiService = {
         // Extract pagination info
         paginationData = response.data.pagination || response.data.meta || response.data.paginator || null;
       }
+      console.log(productsData , "productsData");
 
       return {
         success: true,
@@ -553,6 +554,7 @@ export const apiService = {
     try {
       // Use publicApiClient - products don't require authentication
       const response = await publicApiClient.get(`/products/${id}`);
+      console.log(response.data.data , "response.data.data");
       return {
         success: true,
         data: response.data.data || response.data,
@@ -738,8 +740,16 @@ export const apiService = {
    */
   addToCart: async (productId, variantId, quantity = 1) => {
     try {
-      const response = await authApiClient.post(`/cart/${productId}`, {
-        pack_size_id: variantId,  // مش variant_id → ده السبب الرئيسي لكل المشاكل
+      let response;
+      if(variantId){
+
+        response = await authApiClient.post(`/cart/${productId}`, {
+          variant_id: variantId,  // مش variant_id → ده السبب الرئيسي لكل المشاكل
+        });
+      }else{
+        response = await authApiClient.post(`/cart/${productId}`)
+      }
+      const setQuantity = await authApiClient.put(`/cart/${productId}`, {
         quantity: quantity
       });
 

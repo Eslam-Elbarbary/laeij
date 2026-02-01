@@ -28,7 +28,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedPackSize, setSelectedPackSize] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
@@ -43,30 +43,30 @@ const ProductDetail = () => {
           const productData = response.data;
 
           // نضمن إن pack_sizes دايمًا array
-          if (
-            !productData.pack_sizes ||
-            !Array.isArray(productData.pack_sizes)
-          ) {
-            productData.pack_sizes = [];
-          }
+          // if (
+          //   !productData.pack_sizes ||
+          //   !Array.isArray(productData.pack_sizes)
+          // ) {
+          //   productData.pack_sizes = [];
+          // }
 
           // === الحل السحري: لو مفيش pack_sizes → نعمل واحد وهمي من الـ size العادي ===
-          if (productData.pack_sizes.length === 0) {
-            const fallbackSize = productData.size || "30 جم";
-            const fallbackId =
-              productData.default_pack_size_id || productData.id || 1;
+          // if (productData.pack_sizes.length === 0) {
+          //   const fallbackSize = productData.size || "30 جم";
+          //   const fallbackId =
+          //     productData.default_pack_size_id || productData.id || 1;
 
-            productData.pack_sizes = [
-              {
-                id: fallbackId,
-                size: fallbackSize,
-                price: productData.price,
-              },
-            ];
-          }
+          //   productData.pack_sizes = [
+          //     {
+          //       id: fallbackId,
+          //       size: fallbackSize,
+          //       price: productData.price,
+          //     },
+          //   ];
+          // }
 
           setProduct(productData);
-          setSelectedPackSize(productData.pack_sizes[0]); // نختار الأول (سواء حقيقي أو وهمي)
+          // setSelectedPackSize(productData.pack_sizes[0]); // نختار الأول (سواء حقيقي أو وهمي)
         }
       } catch (err) {
         console.error(err);
@@ -78,6 +78,7 @@ const ProductDetail = () => {
 
     if (id) fetchProduct();
   }, [id, t]);
+  console.log(product);
 
   // Format price helper
   const formatPrice = (price) => {
@@ -87,7 +88,7 @@ const ProductDetail = () => {
     return price;
   };
 
-  const currentPrice = selectedPackSize?.price || product?.price || 0;
+  const currentPrice = selectedVariant?.price || product?.price || 0;
 
   const skeletonBg = isDark
     ? "bg-luxury-brown-darker/60"
@@ -251,31 +252,32 @@ const ProductDetail = () => {
             </div>
 
             {/* Size Selection - مضمون 100% يظهر حجم */}
-            <div>
+            {product?.variants?.length > 0 && (
+            <>
               <label className="block text-primary text-lg font-semibold mb-4">
                 {t("productDetail.size")}:
               </label>
               <div className="flex ltr gap-3 flex-wrap">
-                {product?.pack_sizes?.map((pack) => (
+                {product?.variants?.map((variant) => (
                   <button
-                    key={pack.id}
-                    onClick={() => setSelectedPackSize(pack)}
+                    key={variant.id}
+                    onClick={() => setSelectedVariant(variant)}
                     className={`px-6 py-3 rounded-xl transition-all font-medium border-2 ${
-                      selectedPackSize?.id === pack.id
+                      selectedVariant?.id === variant.id
                         ? "bg-luxury-gold/15 border-luxury-gold text-luxury-gold shadow-lg"
                         : unselectedSizeClasses
                     }`}
                   >
-                    {pack.size}
+                    {variant.name}
                   </button>
                 ))}
               </div>
-
               <p className="mt-2 text-sm text-muted">
                 {t("productDetail.selectedSize")}:{" "}
-                <strong>{selectedPackSize?.size || "جاري التحميل..."}</strong>
-              </p>
-            </div>
+                  <strong>{selectedVariant?.name || t("common.loading")}</strong>
+                </p>
+            </>
+            )}
 
             {/* Quantity */}
             <div>
@@ -406,17 +408,17 @@ const ProductDetail = () => {
                     return;
                   }
 
-                  if (!selectedPackSize) {
+                  if (!selectedVariant && product?.variants?.length > 0) {
                     showToast(t("productDetail.selectSize"), "error");
                     return;
                   }
 
-                  addToCart(product, quantity, selectedPackSize.id); // هنا المفتاح: pack_size.id
+                  addToCart(product, quantity, selectedVariant?.id || null);   // هنا المفتاح: pack_size.id
 
                   showToast(
                     t("productDetail.addedToCart", {
                       name: getTranslatedName(product),
-                      size: selectedPackSize.size,
+                      size: selectedVariant?.name || t("common.loading"),
                     }),
                     "success"
                   );

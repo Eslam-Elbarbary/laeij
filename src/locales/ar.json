@@ -24,7 +24,8 @@
     "submit": "إرسال",
     "language": "اللغة",
     "arabic": "العربية",
-    "english": "English"
+    "english": "English",
+    "selectedSize": "الحجم المختار"
   },
   "navbar": {
     "home": "الرئيسية",
@@ -278,7 +279,8 @@
     "removedFromWishlist": "تم إزالة {{name}} من قائمة الأمنيات",
     "addedToCart": "تم إضافة {{name}} إلى السلة",
     "discount": "خصم {{discount}}%",
-    "currency": "درهم"
+    "currency": "درهم",
+    "selectedSize": "الحجم المختار"
   },
   "cart": {
     "title": "سلة التسوق",

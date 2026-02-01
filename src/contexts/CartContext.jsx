@@ -108,7 +108,7 @@ export const CartProvider = ({ children }) => {
             null;
 
           return {
-            id: item.product_id || item.product?.id || item.id,
+            id: item.product?.id ,
             cartItemId: item.id,
             variantId: item.variant_id || item.pack_size_id || item.variant?.id,
             name: item.product?.name || item.name,
@@ -150,7 +150,9 @@ export const CartProvider = ({ children }) => {
               : response.data.items || [];
 
             // Map API cart items to our format and filter deleted items
+            console.log(items , "mostafa ");
             const formattedItems = formatAndFilterCartItems(items);
+            console.log(formattedItems , "mostafa formatted items");
 
             setCartItems(formattedItems);
           } else {
@@ -170,6 +172,8 @@ export const CartProvider = ({ children }) => {
         if (saved) {
           try {
             const items = JSON.parse(saved);
+
+            console.log(items , "mostafa local storage");
             setCartItems(items);
           } catch {
             setCartItems([]);
@@ -354,7 +358,7 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-
+      console.log("removeFromCart", productId, variant_id);
       if (isAuthenticated) {
         // Find the cart item to get cartItemId and packSizeId
         // داخل removeFromCart function
@@ -367,10 +371,10 @@ export const CartProvider = ({ children }) => {
         // المهم جدًا: نستخدم cartItemId (اللي هو item.id من الـ API)
         const cartItemIdToDelete = cartItem.cartItemId || cartItem.id;
         const variantIdToDelete =
-          variant_id || cartItem.variantId || cartItem.pack_size_id;
+          variant_id || cartItem.product.variant.id;
 
         const response = await apiService.removeFromCart(
-          cartItemIdToDelete,
+          productId,
           variantIdToDelete
         );
 

@@ -277,7 +277,8 @@
     "removedFromWishlist": "{{name}} removed from wishlist",
     "addedToCart": "{{name}} added to cart",
     "discount": "{{discount}}% off",
-    "currency": "AED"
+    "currency": "AED",
+    "selectedSize": "Selected Size"
   },
   "cart": {
     "title": "Shopping Cart",

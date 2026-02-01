@@ -73,7 +73,7 @@ const Cart = () => {
     removeFromCart(itemId, variant_id);
     showToast(t("cart.removedFromCart", { name: itemName }), "success");
   };
-
+  console.log(cartItems);
   return (
     <PageLayout>
       <div className="w-full ltr max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
@@ -244,8 +244,8 @@ const Cart = () => {
                     <button
                       onClick={() =>
                         removeFromCart(
-                          item.cartItemId || item.id,
-                          item.variantId || item.pack_size_id
+                          item.id,
+                          item.variantId 
                         )
                       }
                       className="text-red-600 hover:text-red-800"

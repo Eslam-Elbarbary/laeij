@@ -108,7 +108,7 @@ export const CartProvider = ({ children }) => {
             null;
 
           return {
-            id: item.product?.id ,
+            id: item.product?.id || item.product_id,
             cartItemId: item.id,
             variantId: item.variant_id || item.pack_size_id || item.variant?.id,
             name: item.product?.name || item.name,
@@ -119,6 +119,11 @@ export const CartProvider = ({ children }) => {
             quantity: parseInt(item.quantity || 1),
             image: getImageUrl(rawImage),
             size: item.pack_size?.size || item.size || item.variant?.size,
+            // Preserve product data to check for variants
+            product: item.product ? {
+              ...item.product,
+              variants: item.product.variants || []
+            } : null,
           };
         })
         .filter((item) => {
@@ -289,6 +294,11 @@ export const CartProvider = ({ children }) => {
                 quantity: parseInt(item.quantity || 1),
                 image: getImageUrl(rawImage),
                 size: item.pack_size?.size || item.size || item.variant?.size,
+                // Preserve product data to check for variants
+                product: item.product ? {
+                  ...item.product,
+                  variants: item.product.variants || []
+                } : null,
               };
             });
 
@@ -350,32 +360,46 @@ export const CartProvider = ({ children }) => {
 
   /**
    * Remove product from cart
-   * DELETE /cart/:id
-   * @param {number} productId - Product ID or cart item ID
-   * @param {number} packSizeId - Pack size ID (required by API)
+   * DELETE /cart/:id?variant_id=...
+   * @param {number} productId - Product ID (not cart item ID)
+   * @param {number} variantId - Variant ID (optional, only if product has variants)
    */
-  const removeFromCart = async (productId, variant_id = null) => {
+  const removeFromCart = async (productId, variantId = null) => {
     try {
       setLoading(true);
       setError(null);
-      console.log("removeFromCart", productId, variant_id);
+      
       if (isAuthenticated) {
-        // Find the cart item to get cartItemId and packSizeId
-        // داخل removeFromCart function
+        // Find the cart item to get variantId if not provided
         const cartItem = cartItems.find(
-          (item) => item.id === productId || item.cartItemId === productId
+          (item) => item.id === productId
         );
 
-        if (!cartItem) return { success: false };
+        if (!cartItem) {
+          return { success: false, message: "Item not found in cart" };
+        }
 
-        // المهم جدًا: نستخدم cartItemId (اللي هو item.id من الـ API)
-        const cartItemIdToDelete = cartItem.cartItemId || cartItem.id;
-        const variantIdToDelete =
-          variant_id || cartItem.product.variant.id;
+        // Use provided variantId or get from cart item
+        // Check multiple possible locations for variant ID
+        const finalVariantId = variantId || 
+          cartItem?.variantId || 
+          cartItem?.variant_id || 
+          cartItem?.pack_size_id || 
+          null;
 
+        // Debug logging
+        if (import.meta.env.DEV) {
+          console.log("🗑️ Removing cart item:", {
+            productId,
+            variantId: finalVariantId,
+            cartItem: cartItem
+          });
+        }
+
+        // API expects product ID (not cart item ID)
         const response = await apiService.removeFromCart(
           productId,
-          variantIdToDelete
+          finalVariantId
         );
 
         if (response.success) {
@@ -410,6 +434,11 @@ export const CartProvider = ({ children }) => {
                 quantity: parseInt(item.quantity || 1),
                 image: getImageUrl(rawImage),
                 size: item.pack_size?.size || item.size || item.variant?.size,
+                // Preserve product data to check for variants
+                product: item.product ? {
+                  ...item.product,
+                  variants: item.product.variants || []
+                } : null,
               };
             });
 
@@ -476,14 +505,22 @@ export const CartProvider = ({ children }) => {
 
   /**
    * Update cart item quantity
-   * PUT /cart/:id
-   * @param {number} productId - Product ID or cart item ID
-   * @param {number} quantity - New quantity
-   * @param {number} packSizeId - Pack size ID (required by API)
+   * PUT /cart/:id?quantity=...&variant_id=...
+   * @param {number} productId - Product ID (not cart item ID)
+   * @param {number} quantity - New total quantity (not increment)
+   * @param {number} variantId - Variant ID (optional, only if product has variants)
    */
-  const updateQuantity = async (productId, quantity, packSizeId = null) => {
+  const updateQuantity = async (productId, quantity, variantId = null) => {
+    // If quantity is 0 or less, or if current quantity is 1 and trying to decrease, use delete endpoint
     if (quantity <= 0) {
-      return await removeFromCart(productId, packSizeId);
+      return await removeFromCart(productId, variantId);
+    }
+
+    // Check if current quantity is 1 and we're trying to decrease it
+    const cartItem = cartItems.find((item) => item.id === productId);
+    if (cartItem && cartItem.quantity === 1 && quantity < cartItem.quantity) {
+      // Use delete endpoint when quantity is 1 and user tries to decrease
+      return await removeFromCart(productId, variantId);
     }
 
     try {
@@ -491,22 +528,48 @@ export const CartProvider = ({ children }) => {
       setError(null);
 
       if (isAuthenticated) {
-        // Find the cart item
+        // Find the cart item to get variantId if not provided
         const cartItem = cartItems.find(
-          (item) => item.id === productId || item.cartItemId === productId
+          (item) => item.id === productId
         );
 
         if (!cartItem) {
           return { success: false, message: "Item not found in cart" };
         }
 
-        const cartItemId = cartItem.cartItemId || cartItem.id;
-        const variantId = packSizeId || cartItem.variantId;
+        // Use provided variantId or get from cart item
+        // Check multiple possible locations for variant ID
+        let finalVariantId = variantId || 
+          cartItem?.variantId || 
+          cartItem?.variant_id || 
+          cartItem?.pack_size_id || 
+          null;
 
+        // If still no variantId, check if product has variants from cart item's product data
+        // The cart API response might include product data with variants
+        if (!finalVariantId && cartItem?.product?.variants && Array.isArray(cartItem.product.variants) && cartItem.product.variants.length > 0) {
+          // Product has variants but no variantId stored - use first variant as fallback
+          // This shouldn't normally happen, but handle it gracefully
+          finalVariantId = cartItem.product.variants[0].id;
+          console.warn("⚠️ Product has variants but no variantId in cart item, using first variant:", finalVariantId);
+        }
+
+        // Debug logging
+        if (import.meta.env.DEV) {
+          console.log("🛒 Updating cart item:", {
+            productId,
+            quantity,
+            variantId: finalVariantId,
+            cartItem: cartItem,
+            productHasVariants: cartItem?.product?.variants?.length > 0
+          });
+        }
+
+        // API expects product ID (not cart item ID)
         const response = await apiService.updateCartItem(
-          cartItemId,
+          productId,
           quantity,
-          variantId
+          finalVariantId
         );
 
         if (response.success) {
@@ -541,6 +604,11 @@ export const CartProvider = ({ children }) => {
                 quantity: parseInt(item.quantity || 1),
                 image: getImageUrl(rawImage),
                 size: item.pack_size?.size || item.size || item.variant?.size,
+                // Preserve product data to check for variants
+                product: item.product ? {
+                  ...item.product,
+                  variants: item.product.variants || []
+                } : null,
               };
             });
 
@@ -679,6 +747,11 @@ export const CartProvider = ({ children }) => {
                 quantity: parseInt(item.quantity || 1),
                 image: getImageUrl(rawImage),
                 size: item.pack_size?.size || item.size || item.variant?.size,
+                // Preserve product data to check for variants
+                product: item.product ? {
+                  ...item.product,
+                  variants: item.product.variants || []
+                } : null,
               };
             });
 

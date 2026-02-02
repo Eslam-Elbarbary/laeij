@@ -16,20 +16,20 @@ This document lists all API endpoints that currently **DO NOT require authentica
 
 ## Categories Endpoints
 
-- `GET /categories` - Get all categories (with optional limit parameter)
-- `GET /categories/:id` - Get category by ID
+- `GET /front/categories` - Get all categories (with optional limit parameter)
+- `GET /front/categories/:id` - Get category by ID
 
 ## Products Endpoints
 
-- `GET /products` - Get products with filters and pagination
+- `GET /front/products` - Get products with filters and pagination
   - Supports query parameters: page, limit, category_id, featured, new, price_min, price_max, attribute_options[], sort
-- `GET /products/:id` - Get product by ID
-- `GET /products?featured=true` - Get featured products
-- `GET /products/search?query=...` - Search products
+- `GET /front/products/:id` - Get product by ID
+- `GET /front/products?featured=true` - Get featured products
+- `GET /front/products/search?query=...` - Search products
 
 ## Attributes Endpoints
 
-- `GET /attributes` - Get product attributes (for filters)
+- `GET /front/attributes` - Get product attributes (for filters)
 
 ## Branches Endpoints
 
@@ -55,13 +55,13 @@ This document lists all API endpoints that currently **DO NOT require authentica
 4. `POST /auth/reset-password/send-otp`
 5. `POST /auth/reset-password/verify-otp`
 6. `POST /auth/reset-password/set-new-password`
-7. `GET /categories`
-8. `GET /categories/:id`
-9. `GET /products`
-10. `GET /products/:id`
-11. `GET /products?featured=true` (same as #9 with filter)
-12. `GET /products/search`
-13. `GET /attributes`
+7. `GET /front/categories`
+8. `GET /front/categories/:id`
+9. `GET /front/products`
+10. `GET /front/products/:id`
+11. `GET /front/products?featured=true` (same as #9 with filter)
+12. `GET /front/products/search`
+13. `GET /front/attributes`
 14. `GET /branches`
 15. `GET /offers`
 16. `GET /sliders`

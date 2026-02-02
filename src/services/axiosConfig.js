@@ -17,7 +17,7 @@ import i18n from "../i18n";
 
 // API Base URL - Get from environment variable or use default
 // Set this in your .env file: VITE_API_URL=https://your-api-url.com/api
-const API_BASE_URL ="https://backend.laeij.com/api/front";
+const API_BASE_URL ="https://backend.laeij.com/api";
 
 // Log API URL in development mode for debugging
 if (import.meta.env.DEV) {
@@ -53,7 +53,7 @@ const AUTHENTICATED_ENDPOINTS = [
     "/transactions",
     "/tickets",
     "/booking-lists",
-    "/products/", // Products endpoints that require auth (toggle-favorite, review)
+    "/front/products/", // Products endpoints that require auth (toggle-favorite, review)
 ];
 
 /**

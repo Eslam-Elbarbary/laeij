@@ -30,7 +30,12 @@ const Cart = () => {
   const handleUpdateQuantity = (id, change) => {
     const item = cartItems.find((item) => item.id === id);
     if (item) {
-      updateQuantity(id, Math.max(1, item.quantity + change));
+      const newQuantity = item.quantity + change;
+      // If quantity would be 0 or less, or if current quantity is 1 and trying to decrease, delete the item
+      // The updateQuantity function will handle the deletion
+      const finalQuantity = newQuantity <= 0 ? 0 : newQuantity;
+      // Pass product ID, new quantity, and variantId (if product has variants)
+      updateQuantity(id, finalQuantity, item.variantId || null);
     }
   };
 

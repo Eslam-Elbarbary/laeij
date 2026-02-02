@@ -420,13 +420,13 @@ export const apiService = {
 
   /**
    * Get all categories
-   * GET /categories?limit=-1
+   * GET /front/categories?limit=-1
    * @param {number} limit - Optional limit (-1 for all)
    */
   getCategories: async (limit = -1) => {
     try {
       // Use publicApiClient - categories don't require authentication
-      const response = await publicApiClient.get("/categories", {
+      const response = await publicApiClient.get("/front/categories", {
         params: { limit },
       });
       return {
@@ -445,13 +445,13 @@ export const apiService = {
 
   /**
    * Get category by ID
-   * GET /categories/:id
+   * GET /front/categories/:id
    * @param {number} id - Category ID
    */
   getCategoryById: async (id) => {
     try {
       // Use publicApiClient - categories don't require authentication
-      const response = await publicApiClient.get(`/categories/${id}`);
+      const response = await publicApiClient.get(`/front/categories/${id}`);
       return {
         success: true,
         data: response.data.data || response.data,
@@ -472,7 +472,7 @@ export const apiService = {
 
   /**
    * Get products with filters and pagination
-   * GET /products
+   * GET /front/products
    * @param {Object} filters - Filter parameters
    * @param {number} filters.page - Page number
    * @param {number} filters.limit - Items per page
@@ -487,7 +487,7 @@ export const apiService = {
   getProducts: async (filters = {}) => {
     try {
       // Use publicApiClient - products don't require authentication
-      const response = await publicApiClient.get("/products", { params: filters });
+      const response = await publicApiClient.get("/front/products", { params: filters });
 
       // Handle different response structures from backend
       let productsData = [];
@@ -547,13 +547,13 @@ export const apiService = {
 
   /**
    * Get product by ID
-   * GET /products/:id
+   * GET /front/products/:id
    * @param {number} id - Product ID
    */
   getProductById: async (id) => {
     try {
       // Use publicApiClient - products don't require authentication
-      const response = await publicApiClient.get(`/products/${id}`);
+      const response = await publicApiClient.get(`/front/products/${id}`);
       console.log(response.data.data , "response.data.data");
       return {
         success: true,
@@ -571,13 +571,13 @@ export const apiService = {
 
   /**
    * Get featured products
-   * GET /products?featured=true
+   * GET /front/products?featured=true
    * @param {number} limit - Number of products to return
    */
   getFeaturedProducts: async (limit = 4) => {
     try {
       // Use publicApiClient - products don't require authentication
-      const response = await publicApiClient.get("/products", {
+      const response = await publicApiClient.get("/front/products", {
         params: { featured: true, limit },
       });
       return {
@@ -597,13 +597,13 @@ export const apiService = {
 
   /**
    * Search products
-   * GET /products/search?query=...
+   * GET /front/products/search?query=...
    * @param {string} query - Search query
    */
   searchProducts: async (query) => {
     try {
       // Use publicApiClient - product search doesn't require authentication
-      const response = await publicApiClient.get("/products/search", {
+      const response = await publicApiClient.get("/front/products/search", {
         params: { query },
       });
       return {
@@ -770,16 +770,33 @@ export const apiService = {
 
   /**
    * Update cart item quantity
-   * PUT /cart/:id?quantity=...&pack_size_id=...
-   * @param {number} cartItemId - Cart item ID
-   * @param {number} quantity - New quantity
-   * @param {number} packSizeId - Pack size ID
+   * PUT /cart/:id?quantity=...&variant_id=...
+   * @param {number} productId - Product ID (not cart item ID)
+   * @param {number} quantity - New total quantity (not increment)
+   * @param {number} variantId - Variant ID (optional, only if product has variants)
    */
-  updateCartItem: async (cartItemId, quantity, packSizeId) => {
+  updateCartItem: async (productId, quantity, variantId = null) => {
     try {
       // Use authApiClient - cart operations require authentication
-      const response = await authApiClient.put(`/cart/${cartItemId}`, null, {
-        params: { quantity, pack_size_id: packSizeId },
+      // Build query parameters
+      const params = { quantity };
+      
+      // Add variant_id if provided (product has variants)
+      // Note: Backend requires variant_id when product has variants
+      if (variantId) {
+        params.variant_id = variantId;
+      }
+      
+      // Debug logging
+      if (import.meta.env.DEV) {
+        console.log("🔄 API: Updating cart item", {
+          url: `/cart/${productId}`,
+          params: params
+        });
+      }
+      
+      const response = await authApiClient.put(`/cart/${productId}`, null, {
+        params: params,
       });
       return {
         success: true,
@@ -793,7 +810,7 @@ export const apiService = {
         // Suppress console error for expected route not found
         // The interceptor already marked this as suppressLog
         if (!error.suppressLog) {
-          console.warn(`⚠️ API Route Not Found (expected): PUT /cart/${cartItemId}`);
+          console.warn(`⚠️ API Route Not Found (expected): PUT /cart/${productId}`);
         }
       } else if (!error.suppressLog) {
         console.error("Error updating cart item:", error);
@@ -808,24 +825,41 @@ export const apiService = {
 
   /**
    * Remove item from cart
-   * DELETE /cart/:id?pack_size_id=...
-   * @param {number} productId - Product ID (used in URL path)
-   * @param {number} variantId - Variant/Pack size ID (used as query parameter)
-   */removeFromCart: async (cartItemId, variantId = null) => {
+   * DELETE /cart/:id?variant_id=...
+   * @param {number} productId - Product ID (not cart item ID)
+   * @param {number} variantId - Variant ID (optional, only if product has variants)
+   */
+  removeFromCart: async (productId, variantId = null) => {
     try {
-      console.log("جاري حذف cart_item_id:", cartItemId, "variant_id:", variantId);
+      // Build query parameters
+      const params = {};
+      
+      // Add variant_id if provided (product has variants)
+      if (variantId) {
+        params.variant_id = variantId;
+      }
 
-      const response = await authApiClient.delete(`/cart/${cartItemId}`, {
-        data: variantId ? { variant_id: variantId } : {}
+      // Debug logging
+      if (import.meta.env.DEV) {
+        console.log("🗑️ API: Removing cart item", {
+          url: `/cart/${productId}`,
+          params: params
+        });
+      }
+
+      const response = await authApiClient.delete(`/cart/${productId}`, {
+        params: params
       });
 
-      console.log("تم الحذف من السيرفر بنجاح:", response.data);
-      return { success: true, data: response.data };
+      if (import.meta.env.DEV) {
+        console.log("✅ Item removed successfully:", response.data);
+      }
+      return { success: true, data: response.data.data || response.data };
     } catch (error) {
-      console.error("فشل حذف من السيرفر:", error.response?.status, error.response?.data);
+      console.error("❌ Failed to remove item:", error.response?.status, error.response?.data);
       return {
         success: false,
-        message: error.response?.data?.message || "فشل الحذف",
+        message: error.response?.data?.message || "Failed to remove item",
         status: error.response?.status
       };
     }
@@ -1245,12 +1279,12 @@ export const apiService = {
 
   /**
    * Get product attributes (for filters)
-   * GET /attributes
+   * GET /front/attributes
    */
   getAttributes: async () => {
     try {
       // Use publicApiClient - attributes don't require authentication
-      const response = await publicApiClient.get("/attributes");
+      const response = await publicApiClient.get("/front/attributes");
       return {
         success: true,
         data: response.data.data || response.data,

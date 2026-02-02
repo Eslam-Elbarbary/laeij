@@ -42,31 +42,15 @@ const ProductDetail = () => {
         if (response.success && response.data) {
           const productData = response.data;
 
-          // نضمن إن pack_sizes دايمًا array
-          // if (
-          //   !productData.pack_sizes ||
-          //   !Array.isArray(productData.pack_sizes)
-          // ) {
-          //   productData.pack_sizes = [];
-          // }
-
-          // === الحل السحري: لو مفيش pack_sizes → نعمل واحد وهمي من الـ size العادي ===
-          // if (productData.pack_sizes.length === 0) {
-          //   const fallbackSize = productData.size || "30 جم";
-          //   const fallbackId =
-          //     productData.default_pack_size_id || productData.id || 1;
-
-          //   productData.pack_sizes = [
-          //     {
-          //       id: fallbackId,
-          //       size: fallbackSize,
-          //       price: productData.price,
-          //     },
-          //   ];
-          // }
+          // Debug: Log product data structure to help identify attributes
+          if (import.meta.env.DEV) {
+            console.log("Product data structure:", productData);
+            console.log("Product attributes:", productData.attributes);
+            console.log("Product features:", productData.features);
+            console.log("Product specifications:", productData.specifications);
+          }
 
           setProduct(productData);
-          // setSelectedPackSize(productData.pack_sizes[0]); // نختار الأول (سواء حقيقي أو وهمي)
         }
       } catch (err) {
         console.error(err);
@@ -320,22 +304,6 @@ const ProductDetail = () => {
                 {getTranslatedDescription(product)}
                 {}
               </p>
-            </div>
-
-            {/* Key Features */}
-            <div>
-              <button
-                className={`w-full ltr flex items-center justify-between py-4 border rounded-xl px-4 transition-colors ${
-                  isDark
-                    ? "border-luxury-gold-dark/30 hover:bg-luxury-brown-darker/40 text-luxury-brown-light"
-                    : "border-luxury-gold-light/40 hover:bg-luxury-cream/70 text-luxury-brown-text"
-                }`}
-              >
-                <span className="font-medium">
-                  {t("productDetail.keyFeatures")}
-                </span>
-                <span>▼</span>
-              </button>
             </div>
 
             {/* Wishlist and Add to Cart Buttons */}
